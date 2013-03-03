@@ -13,5 +13,5 @@ Generation and manipulation of triangular meshes.
 
 ## Code cleanup
 
-1. Many type signatures should probably be removed or generalized.
+1. Many type annotations should probably be removed or generalized.
 2. There are probably lots of speed improvements to be had as I learn the ins and outs of idiomatic Julia.

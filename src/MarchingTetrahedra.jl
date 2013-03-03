@@ -219,7 +219,7 @@ function procVox{T<:Real}(vals::Vector{T}, iso::T,
 
             # add the face to the list
             vId(e) = getVertId(voxEdgeId(i,e),x,y,z,nx,ny,vals,iso,vts)
-            push(fcs,(vId(e1),vId(e2),vId(e3)))
+            push!(fcs,(vId(e1),vId(e2),vId(e3)))
         end
     end
 end
@@ -227,7 +227,7 @@ end
 # Given a 3D array and an isovalue, extracts a mesh represention of the 
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
-    vts = Dict{Int64,Vec3f}(0)
+    vts = Dict{Int64,Vec3f}()
     fcs = Array(Vec3i,0)
 
     # a helper function for fetching the values at the corners of a voxel

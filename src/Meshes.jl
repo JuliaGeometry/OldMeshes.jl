@@ -26,9 +26,9 @@ function isosurface(lsf,isoval)
     (vts,fcs) = marchingTetrahedra(lsf,isoval)
 
     # normalize the mesh representation
-    prs = pairs(vts)
+    prs = collect(vts)
     nV = size(prs,1)
-    vtD = Dict{Int64,Int64}(nV)
+    vtD = Dict{Int64,Int64}()
     for k = 1:nV
         vtD[prs[k][1]] = k
     end
