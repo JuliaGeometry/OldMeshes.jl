@@ -24,4 +24,9 @@ toc()
 #   
 exportToPly(msh,"noisy_sphere.ply")
 
+# test contatenation
+msh2 = merge(msh,msh)
+
+
+
 

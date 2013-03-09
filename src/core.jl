@@ -32,7 +32,7 @@ function merge(m1::Mesh, m2::Mesh)
     nV = size(v1,1)
     f2 = m2.faces
     nF = size(f2,1)
-    newF2 = [ (f2[i][1]+nV, f2[i][2]+nV, f2[i][3]+nV) for i = 1:nF ]
+    newF2 = Face[ Face(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
     Mesh(append!(v1,m2.vertices),append!(f1,newF2))
 end
 export merge
