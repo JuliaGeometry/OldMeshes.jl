@@ -29,12 +29,6 @@
 #
 #  /
 # X
-module MarchingTetrahedra
-
-export marchingTetrahedra
-
-typealias Vec3f (Float64,Float64,Float64)
-typealias Vec3i (Int64,Int64,Int64)
 
 # (X,Y,Z)-coordinates for each voxel corner ID
 const voxCrnrPos = [[0 0 0],
@@ -173,7 +167,7 @@ function vertPos{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
     src = org+float(voxCrnrPos[:,ixs[1]])
     tgt = org+float(voxCrnrPos[:,ixs[2]])
     vrt = a*tgt+b*src
-    (vrt[1],vrt[2],vrt[3])
+    Vertex(vrt[1],vrt[2],vrt[3])
 end
 
 # Gets the vertex ID, adding it to the vertex dictionary if not already
@@ -181,7 +175,7 @@ end
 function getVertId{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
                             nx::Int64, ny::Int64,
                             vals::Vector{T}, iso::T,
-                            vts::Dict{Int64,Vec3f})
+                            vts::Dict{Int64,Vertex})
     vId = vertId(e,x,y,z,nx,ny)
     if !has(vts,vId)
         vts[vId] = vertPos(e,x,y,z,vals,iso)
@@ -203,7 +197,7 @@ end
 function procVox{T<:Real}(vals::Vector{T}, iso::T,
                           x::Int64, y::Int64, z::Int64,
                           nx::Int64, ny::Int64,
-                          vts::Dict{Int64,Vec3f}, fcs::Vector{Vec3i})
+                          vts::Dict{Int64,Vertex}, fcs::Vector{Face})
 
     # check each sub-tetrahedron in the voxel
     for i = 1:6
@@ -219,7 +213,7 @@ function procVox{T<:Real}(vals::Vector{T}, iso::T,
 
             # add the face to the list
             vId(e) = getVertId(voxEdgeId(i,e),x,y,z,nx,ny,vals,iso,vts)
-            push!(fcs,(vId(e1),vId(e2),vId(e3)))
+            push!(fcs,Face(vId(e1),vId(e2),vId(e3)))
         end
     end
 end
@@ -227,8 +221,8 @@ end
 # Given a 3D array and an isovalue, extracts a mesh represention of the 
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
-    vts = Dict{Int64,Vec3f}()
-    fcs = Array(Vec3i,0)
+    vts = Dict{Int64,Vertex}()
+    fcs = Array(Face,0)
 
     # a helper function for fetching the values at the corners of a voxel
     function ix(i,j,k,l)
@@ -252,4 +246,22 @@ function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
     (vts,fcs)
 end
 
+function isosurface(lsf,isoval)
+    # get marching tetrahedra version of the mesh
+    (vts,fcs) = marchingTetrahedra(lsf,isoval)
+
+    # normalize the mesh representation
+    prs = collect(vts)
+    nV = size(prs,1)
+    vtD = Dict{Int64,Int64}()
+    for k = 1:nV
+        vtD[prs[k][1]] = k
+    end
+    nF = size(fcs,1)
+    newFace(f) = Face(vtD[f.v1],vtD[f.v2],vtD[f.v3])
+    fcAry = Face[ newFace(fcs[i]) for i = 1:nF ]
+    vtAry = Vertex[prs[i][2] for i = 1:nV]
+
+    Mesh(vtAry,fcAry)
 end
+export isosurface
