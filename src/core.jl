@@ -1,23 +1,23 @@
 immutable Vertex
-    x :: Float64
-    y :: Float64
-    z :: Float64
+    x :: FloatingPoint
+    y :: FloatingPoint
+    z :: FloatingPoint
 end
 export Vertex
 
 import Base.+, Base.-, Base.*, Base./
 +(v1::Vertex,v2::Vertex) = Vertex(v1.x+v2.x,v1.y+v2.y,v1.z+v2.z)
 -(v1::Vertex,v2::Vertex) = Vertex(v1.x-v2.x,v1.y-v2.y,v1.z-v2.z)
-*(s::Float64,v::Vertex) = Vertex(s*v.x,s*v.y,s*v.z)
-*(v::Vertex,s::Float64) = Vertex(v.x*s,v.y*s,v.z*s)
-/(v::Vertex,s::Float64) = Vertex(v.x/s,v.y/s,v.z/s)
+*(s::FloatingPoint,v::Vertex) = Vertex(s*v.x,s*v.y,s*v.z)
+*(v::Vertex,s::FloatingPoint) = Vertex(v.x*s,v.y*s,v.z*s)
+/(v::Vertex,s::FloatingPoint) = Vertex(v.x/s,v.y/s,v.z/s)
 
-# Mesh as indexed face-set
-# ========================
+# Mesh in indexed face-set-representation
+# =======================================
 immutable IndexedFace
-    v1 :: Int64
-    v2 :: Int64
-    v3 :: Int64
+    v1 :: Int
+    v2 :: Int
+    v3 :: Int
 end
 export IndexedFace
 
@@ -39,8 +39,32 @@ function merge(m1::IndexedFaceSet, m2::IndexedFaceSet)
 end
 export merge
 
-## Mesh as face-set
-## ================
-#immutable FaceSet
-#    faces :: Vecoor
-#end
+# Mesh in face-set representation
+# ===============================
+immutable Face
+    vertices :: Vector{Vector}
+end
+immutable FaceSet
+    faces :: Vector{Face}
+end
+
+# Mesh in half-edge (he) set representation
+# =========================================
+immutable HalfEdge
+    n           :: Int
+    vetexRef    :: Int
+    faceRef     :: Int
+    edgeRefNext :: Int
+    edgeRefPrev :: Int
+    edgeRefOp   :: Int
+end
+immutable HeVertex
+    n       :: Int
+    coord   :: Vertex
+    edgeRef :: Int
+end
+
+immutable HeFace
+   n       :: Int
+   edgeRef :: Int 
+end

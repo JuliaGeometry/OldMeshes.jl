@@ -18,17 +18,17 @@ function exportToPly(msh::IndexedFaceSet, fn::String)
     # write the data
     for i = 1:nV
         v = vts[i]
-        write(str,float32(v.x))
-        write(str,float32(v.y))
-        write(str,float32(v.z))
+        write(str,float(v.x))
+        write(str,float(v.y))
+        write(str,float(v.z))
     end
 
    for i = 1:nF
         f = fcs[i]
         write(str,uint8(3))
-        write(str,int32(f.v1-1))
-        write(str,int32(f.v2-1))
-        write(str,int32(f.v3-1))
+        write(str,int(f.v1-1))
+        write(str,int(f.v2-1))
+        write(str,int(f.v3-1))
     end
     close(str)
 end
@@ -36,12 +36,12 @@ export exportToPly
 
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @IndexedFaceSet@
 function import2dm(file::String)
-    parseNode(w::Array{String}) = Vertex(float64(w[3]), float64(w[4]), float64(w[5]))
-    parseTriangle(w::Array{String}) = IndexedFace(int64(w[3]), int64(w[4]), int64(w[5]))
+    parseNode(w::Array{String}) = Vertex(float(w[3]), float(w[4]), float(w[5]))
+    parseTriangle(w::Array{String}) = IndexedFace(int(w[3]), int(w[4]), int(w[5]))
     # Qudrilateral faces are split up into triangles
     function parseQuad(w::Array{String})
         w[7] = w[3]                     # making a circle
-        IndexedFace[IndexedFace(int64(w[i]), int64(w[i+1]), int64(w[i+2])) for i = [3,5]]
+        IndexedFace[IndexedFace(int(w[i]), int(w[i+1]), int(w[i+2])) for i = [3,5]]
     end 
     con = open(file, "r")
     nd =  Array(Vertex, 0)
