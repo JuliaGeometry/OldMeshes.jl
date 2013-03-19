@@ -23,9 +23,12 @@ toc()
 # The mesh can be visualized, e.g., in MeshLab (http://meshlab.sourceforge.net/).
 #   
 exportToPly(msh,"noisy_sphere.ply")
+exportTo2dm(msh, "noisy_sphere.2dm")
+msh_export = import2dm("noisy_sphere.2dm")
 
 # test contatenation
-msh2 = merge(msh,msh)
+msh1 = merge(msh,msh)
+
 
 
 

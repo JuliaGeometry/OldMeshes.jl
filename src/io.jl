@@ -65,13 +65,14 @@ end
 export import2dm
 
 # | Write @IndexedFaceSet@ to an IOStream
-function exportTo2dm(f::IO,m::IndexedFaceSet)
+function exportTo2dm(m::IndexedFaceSet, f::IO)
     function renderVertex(i::Int,v::Vertex)
         "ND $i $(v.x) $(v.y) $(v.z)\n"
     end
     function renderIndexedFace(i::Int, f::IndexedFace)
         "E3T $i $(f.v1) $(f.v2) $(f.v3) 0\n"
     end
+    write(f, "MESH2D\n")
     for i = 1:length(m.faces)
         write(f, renderIndexedFace(i, m.faces[i]))
     end
@@ -82,9 +83,9 @@ function exportTo2dm(f::IO,m::IndexedFaceSet)
 end
 
 # | Write a @IndexedFaceSet@ to file in SMS-.2dm-file-format
-function exportTo2dm(f::String,m::IndexedFaceSet)
+function exportTo2dm(m::IndexedFaceSet, f::String)
     con = open(f, "w")
-    exportTo2dm(con, m)
+    exportTo2dm(m, con)
     close(con)
     nothing
 end
