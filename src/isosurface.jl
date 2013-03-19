@@ -114,7 +114,7 @@ const tetTri = [[0 0 0 0 0 0],
 
 # Checks if a voxel has faces. Should be false for most voxels.
 # This function should be made as fast as possible.
-function hasFaces{T<:Real}(vals::Vector{T}, iso::T)
+function hasIndexedFaces{T<:Real}(vals::Vector{T}, iso::T)
     hasFcs = false
     if vals[1] < iso
         for i = 2:8
@@ -197,7 +197,7 @@ end
 function procVox{T<:Real}(vals::Vector{T}, iso::T,
                           x::Int64, y::Int64, z::Int64,
                           nx::Int64, ny::Int64,
-                          vts::Dict{Int64,Vertex}, fcs::Vector{Face})
+                          vts::Dict{Int64,Vertex}, fcs::Vector{IndexedFace})
 
     # check each sub-tetrahedron in the voxel
     for i = 1:6
@@ -213,7 +213,7 @@ function procVox{T<:Real}(vals::Vector{T}, iso::T,
 
             # add the face to the list
             vId(e) = getVertId(voxEdgeId(i,e),x,y,z,nx,ny,vals,iso,vts)
-            push!(fcs,Face(vId(e1),vId(e2),vId(e3)))
+            push!(fcs,IndexedFace(vId(e1),vId(e2),vId(e3)))
         end
     end
 end
@@ -222,7 +222,7 @@ end
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
     vts = Dict{Int64,Vertex}()
-    fcs = Array(Face,0)
+    fcs = Array(IndexedFace,0)
 
     # a helper function for fetching the values at the corners of a voxel
     function ix(i,j,k,l)
@@ -236,7 +236,7 @@ function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
         for j = 1:ny-1
             for i = 1:nx-1
                 vals = T[ix(i,j,k,l) for l = 1:8]
-                if hasFaces(vals,iso)
+                if hasIndexedFaces(vals,iso)
                     procVox(vals,iso,i,j,k,nx,ny,vts,fcs)
                 end
             end
@@ -258,10 +258,10 @@ function isosurface(lsf,isoval)
         vtD[prs[k][1]] = k
     end
     nF = size(fcs,1)
-    newFace(f) = Face(vtD[f.v1],vtD[f.v2],vtD[f.v3])
-    fcAry = Face[ newFace(fcs[i]) for i = 1:nF ]
+    newIndexedFace(f) = IndexedFace(vtD[f.v1],vtD[f.v2],vtD[f.v3])
+    fcAry = IndexedFace[ newIndexedFace(fcs[i]) for i = 1:nF ]
     vtAry = Vertex[prs[i][2] for i = 1:nV]
 
-    Mesh(vtAry,fcAry)
+    IndexedFaceSet(vtAry,fcAry)
 end
 export isosurface

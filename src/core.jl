@@ -12,27 +12,35 @@ import Base.+, Base.-, Base.*, Base./
 *(v::Vertex,s::Float64) = Vertex(v.x*s,v.y*s,v.z*s)
 /(v::Vertex,s::Float64) = Vertex(v.x/s,v.y/s,v.z/s)
 
-immutable Face
+# Mesh as indexed face-set
+# ========================
+immutable IndexedFace
     v1 :: Int64
     v2 :: Int64
     v3 :: Int64
 end
-export Face
+export IndexedFace
 
-type Mesh
+type IndexedFaceSet
     vertices :: Vector{Vertex}
-    faces :: Vector{Face}
+    faces    :: Vector{IndexedFace}
 end
-export Mesh
+export IndexedFaceSet
 
-# concatenates two meshes
-function merge(m1::Mesh, m2::Mesh)
+# | concatenates two @IndexedFaceSet@s
+function merge(m1::IndexedFaceSet, m2::IndexedFaceSet)
     v1 = copy(m1.vertices)
     f1 = copy(m1.faces)
     nV = size(v1,1)
     f2 = m2.faces
     nF = size(f2,1)
-    newF2 = Face[ Face(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
-    Mesh(append!(v1,m2.vertices),append!(f1,newF2))
+    newF2 = IndexedFace[ IndexedFace(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
+    IndexedFaceSet(append!(v1,m2.vertices),append!(f1,newF2))
 end
 export merge
+
+## Mesh as face-set
+## ================
+#immutable FaceSet
+#    faces :: Vecoor
+#end
