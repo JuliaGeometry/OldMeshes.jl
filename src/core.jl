@@ -92,24 +92,3 @@ function normal(f::Face)
     cross(a,b)
 end
 export normal
-
-# Mesh in half-edge (he) set representation
-# =========================================
-immutable HalfEdge
-    n           :: Int
-    vetexRef    :: Int
-    faceRef     :: Int
-    edgeRefNext :: Int
-    edgeRefPrev :: Int
-    edgeRefOp   :: Int
-end
-immutable HeVertex
-    n       :: Int
-    coord   :: Vertex
-    edgeRef :: Int
-end
-
-immutable HeFace
-   n       :: Int
-   edgeRef :: Int 
-end

@@ -4,9 +4,14 @@ Generation and manipulation of triangular meshes.
 
 ## Features
 
-1. Isosurface extraction via marching tetrahedra.
-2. Export to PLY format.
-3. Import and Export of Aquaveo-SMS .2dm format.
+* Isosurface extraction via marching tetrahedra.
+* Import
+    - Aquaveo-SMS .2dm 
+
+* Export
+    - Ply
+    - Stl
+    - Aquaveo-SMS .2dm 
 
 ## Coming soon, hopefully...
 
