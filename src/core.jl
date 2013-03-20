@@ -39,6 +39,20 @@ function merge(m1::IndexedFaceSet, m2::IndexedFaceSet)
 end
 export merge
 
+# | Difference between two meshes as new mesh ; currently they could
+# | only differ in vertex-z values
+# |
+# | TODO : Implement difference between arbitrary surfaces
+function diff(m1::IndexedFaceSet,m2::IndexedFaceSet)
+    vertices = Vertex[]
+    for i = 1:length(m1.vertices)
+        v1 = m1.vertices[i]
+        v2 = m2.vertices[i]
+        push!(vertices,Vertex(v1.x, v1.y, v2.z - v2.z))
+    end
+    IndexedFaceSet(vertices, m1.faces)
+end
+export diff
 # Mesh in face-set representation
 # ===============================
 immutable Face
