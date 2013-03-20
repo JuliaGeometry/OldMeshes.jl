@@ -1,16 +1,21 @@
-immutable Vertex
+immutable Vector3d
     x :: FloatingPoint
     y :: FloatingPoint
     z :: FloatingPoint
 end
+export Vector3d
+typealias Vertex Vector3d
 export Vertex
 
 import Base.+, Base.-, Base.*, Base./
-+(v1::Vertex,v2::Vertex) = Vertex(v1.x+v2.x,v1.y+v2.y,v1.z+v2.z)
--(v1::Vertex,v2::Vertex) = Vertex(v1.x-v2.x,v1.y-v2.y,v1.z-v2.z)
-*(s::FloatingPoint,v::Vertex) = Vertex(s*v.x,s*v.y,s*v.z)
-*(v::Vertex,s::FloatingPoint) = Vertex(v.x*s,v.y*s,v.z*s)
-/(v::Vertex,s::FloatingPoint) = Vertex(v.x/s,v.y/s,v.z/s)
++(v1::Vector3d,v2::Vector3d) = Vector3d(v1.x+v2.x,v1.y+v2.y,v1.z+v2.z)
+-(v1::Vector3d,v2::Vector3d) = Vector3d(v1.x-v2.x,v1.y-v2.y,v1.z-v2.z)
+*(s::FloatingPoint,v::Vector3d) = Vector3d(s*v.x,s*v.y,s*v.z)
+*(v::Vector3d,s::FloatingPoint) = Vector3d(v.x*s,v.y*s,v.z*s)
+/(v::Vector3d,s::FloatingPoint) = Vector3d(v.x/s,v.y/s,v.z/s)
+import Base.convert
+convert(::Type{FloatingPoint},x::Vector3d) = [x.x,x.y,x.z]
+export convert
 
 # Mesh in indexed face-set-representation
 # =======================================
@@ -27,7 +32,7 @@ type IndexedFaceSet
 end
 export IndexedFaceSet
 
-# | concatenates two @IndexedFaceSet@s
+# | Concatenate two @IndexedFaceSet@s
 function merge(m1::IndexedFaceSet, m2::IndexedFaceSet)
     v1 = copy(m1.vertices)
     f1 = copy(m1.faces)
@@ -48,19 +53,45 @@ function diff(m1::IndexedFaceSet,m2::IndexedFaceSet)
     for i = 1:length(m1.vertices)
         v1 = m1.vertices[i]
         v2 = m2.vertices[i]
-        push!(vertices,Vertex(v1.x, v1.y, v2.z - v2.z))
+        push!(vertices,Vertex(v1.x, v1.y, v2.z - v1.z))
     end
     IndexedFaceSet(vertices, m1.faces)
 end
 export diff
+
+
 # Mesh in face-set representation
 # ===============================
 immutable Face
-    vertices :: Vector{Vector}
+    v1 :: Vertex
+    v2 :: Vertex
+    v3 :: Vertex
 end
+export Face
+
 immutable FaceSet
     faces :: Vector{Face}
 end
+export FaceSet
+
+import Base.convert
+convert(::Type{FaceSet},x::IndexedFaceSet) = 
+    FaceSet(Face[Face(x.vertices[f.v1], x.vertices[f.v2], x.vertices[f.v3]) for f = x.faces])
+export convert
+
+import Base.cross
+function cross(x::Vector3d, y::Vector3d)
+    c = cross(convert(FloatingPoint, x), convert(FloatingPoint,y))
+    Vector3d(c[1],c[2],c[3])
+end
+export cross
+
+function normal(f::Face)
+    a = (f.v2 - f.v1)
+    b = (f.v3 - f.v2)
+    cross(a,b)
+end
+export normal
 
 # Mesh in half-edge (he) set representation
 # =========================================

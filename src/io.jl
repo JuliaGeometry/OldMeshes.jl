@@ -35,7 +35,7 @@ end
 export exportToPly
 
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @IndexedFaceSet@
-function import2dm(file::String)
+function importFrom2dm(file::String)
     parseNode(w::Array{String}) = Vertex(float(w[3]), float(w[4]), float(w[5]))
     parseTriangle(w::Array{String}) = IndexedFace(int(w[3]), int(w[4]), int(w[5]))
     # Qudrilateral faces are split up into triangles
@@ -62,7 +62,7 @@ function import2dm(file::String)
     close(con)
     IndexedFaceSet(nd,ele)
 end
-export import2dm
+export importFrom2dm
 
 # | Write @IndexedFaceSet@ to an IOStream
 function exportTo2dm(m::IndexedFaceSet, f::IO)
@@ -90,3 +90,35 @@ function exportTo2dm(m::IndexedFaceSet, f::String)
     nothing
 end
 export exportTo2dm
+
+# | Render @FaceSet@ as Stl-string
+function exportToStl(m::FaceSet)
+    renderVertex(v)  = "    vertex $(v.x) $(v.y)  $(v.z)"
+    function renderFace(f)
+        fn = normal(f)
+        fn_header= "facet normal $(fn.x) $(fn.y) $(fn.z)" 
+        v_start  = "  outer loop"
+        v        = join(map(renderVertex, [f.v1,f.v2,f.v3]), "\n")
+        v_end    = "  endloop"
+        f_footer = "endfacet"
+        join([fn_header,v_start, v, v_end,f_footer], "\n")
+    end
+    header = "solid "
+    fs = join(map(renderFace, m.faces), "\n")
+    footer = "endsolid "                     
+    join([header, fs, footer], "\n")
+end
+
+# | Write an @FaceSet@ as Stl to @IOStream@
+function exportToStl(m::FaceSet, con::IOStream)
+    write(con, exportToStl(m))
+end
+
+# | Write an @FaceSet@ as Stl into a file
+function exportToStl(m::FaceSet, f::String)
+    con = open(f, "w")
+    exportToStl(m, con)
+    close(con)
+    nothing
+end
+export exportToStl
