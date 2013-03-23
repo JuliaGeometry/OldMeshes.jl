@@ -1,16 +1,4 @@
-immutable Vertex
-    x :: Float64
-    y :: Float64
-    z :: Float64
-end
-export Vertex
-
-import Base.+, Base.-, Base.*, Base./
-+(v1::Vertex,v2::Vertex) = Vertex(v1.x+v2.x,v1.y+v2.y,v1.z+v2.z)
--(v1::Vertex,v2::Vertex) = Vertex(v1.x-v2.x,v1.y-v2.y,v1.z-v2.z)
-*(s::Float64,v::Vertex) = Vertex(s*v.x,s*v.y,s*v.z)
-*(v::Vertex,s::Float64) = Vertex(v.x*s,v.y*s,v.z*s)
-/(v::Vertex,s::Float64) = Vertex(v.x/s,v.y/s,v.z/s)
+using Geometry
 
 immutable Face
     v1 :: Int64
@@ -20,7 +8,7 @@ end
 export Face
 
 type Mesh
-    vertices :: Vector{Vertex}
+    vertices :: Vector{Point3d}
     faces :: Vector{Face}
 end
 export Mesh

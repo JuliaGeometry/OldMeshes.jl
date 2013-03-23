@@ -224,22 +224,13 @@ function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
     vts = Dict{Int64,Vertex}()
     fcs = Array(Face,0)
 
-    # a helper function for fetching the values at the corners of a voxel
-    function ix(i,j,k,l)
-        dx = voxCrnrPos[:,l]
-        lsf[i+dx[1],j+dx[2],k+dx[3]]
-    end
-
     # process each voxel
     (nx,ny,nz) = size(lsf)
-    for k = 1:nz-1
-        for j = 1:ny-1
-            for i = 1:nx-1
-                vals = T[ix(i,j,k,l) for l = 1:8]
-                if hasFaces(vals,iso)
-                    procVox(vals,iso,i,j,k,nx,ny,vts,fcs)
-                end
-            end
+    for k = 1:nz-1, j = 1:ny-1, i = 1:nx-1
+        vals = T[lsf[i+voxCrnrPos[1,l],j+voxCrnrPos[2,l],k+voxCrnrPos[3,l]] 
+                 for l = 1:8]
+        if hasFaces(vals,iso)
+            procVox(vals,iso,i,j,k,nx,ny,vts,fcs)
         end
     end
 
