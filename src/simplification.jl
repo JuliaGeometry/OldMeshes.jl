@@ -25,10 +25,11 @@
 # A data structure representing a triangular mesh that
 # admits edge collapse.
 #
-immutable HalfEdge
+type HalfEdge
     source   :: Int64 # vertex index at the root of the half-edge
     next     :: Int64 # the next edge in this (oriented) face
     opposite :: Int64 # the other edge in the adjoining face (if not on bdy)
+    HalfEdge(s,n,o) = new(s,n,o)
 end
 
 type CollapsibleMesh
@@ -54,7 +55,7 @@ clockwise(cm,e) = next(cm,opposite(cm,e))
 # clockwise edge iterator
 macro forEachEdge(cm,e,body)
     quote
-        ee = e
+        local ee = e
         while true
             $body
             e = clockwise(cm,e)
@@ -79,7 +80,7 @@ function isCollapsibleEdge(cm,e)
     src = source(cm,e)
     tgt = target(cm,e)
     @assert !isDeletedVertex(cm,src)
-    @assert ! isDeletedVertex(cm,tgt)
+    @assert !isDeletedVertex(cm,tgt)
 
     # check for boundary
     if isBoundaryEdge(cm,e); return false; end
@@ -93,11 +94,11 @@ function isCollapsibleEdge(cm,e)
 
     srcNbrs = IntSet()
     se = edge(cm,src)
-    @forEach cm se add!(srcNbrs,target(cm,se))
+    @forEachEdge cm se add!(srcNbrs,target(cm,se))
 
     tgtNbrs = IntSet()
     te = edge(cm,tgt)
-    @forEach cm te add!(tgtNbrs,target(cm,te))
+    @forEachEdge cm te add!(tgtNbrs,target(cm,te))
 
     if length(intersect(srcNbrs,tgtNbrs)) != 2; return false; end
 
@@ -108,10 +109,9 @@ function isCollapsibleEdge(cm,e)
 end
 
 # edge collapse
-function collapse(cm::CollapsibleMesh, e::Int64, pos::Vertex)
-    
-    # bail if the edge is not collapsible
-    if !isCollapsible(cm,e); return; end
+function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
+        
+    if !isCollapsible(cm,e) return false end
 
     # id the relevant edges, vertices
     # 
@@ -145,6 +145,42 @@ function collapse(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     vl = source(cm,ep)
     vr = source(cm,op)
 
+    # check that the new vertex position doesn't cause an inversion. 
+    function causesInversion(e)
+        v0 = source(cm,e)
+        v1 = target(cm,e)
+        v2 = target(cm,next(e))
+        p0 = position(cm,v0)
+        p1 = position(cm,v1)
+        p2 = position(cm,v2)
+        n1 = unit(cross(p1-p0,p2-p0))
+        n2 = unit(cross(p1-pos,p2-pos))
+        dot(n1,n2) <= 0
+    end
+
+    # circle source vertex
+    ee = e
+    p0 = position(cm,src)
+    @forEachEdge cm ee begin
+        if ee != e && ee != on
+            if causesInversion(ee)
+                return false
+            end
+        end
+    end
+
+    # circle target vertex
+    ee = o
+    @forEachEdge cm o begin
+        if ee != o && ee != en
+            if causesInversion(ee)
+                return false
+            end
+        end
+    end
+
+    # now perform the actual collapse...
+
     # fix up the edge opposites for the edges that remain
     cm.edges[epo].opposite = eno;
     cm.edges[eno].opposite = epo;
@@ -173,6 +209,8 @@ function collapse(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     cm.edges[op].next = 0
     cm.edges[on].next = 0
     cm.edges[o].next = 0
+
+    return true
 end
 
 ###########################################################
@@ -182,8 +220,8 @@ end
 
 # construction from a vanilla mesh
 function CollapsibleMesh(m::Mesh)
-    vts = mesh.vertices
-    fcs = mesh.faces
+    vts = m.vertices
+    fcs = m.faces
 
     nVts = length(vts)
     nFcs = length(fcs)
@@ -202,9 +240,9 @@ function CollapsibleMesh(m::Mesh)
         vs[fc.v3] = 3*i
 
         # set sources
-        es[3*i-2].source = fc.v1
-        es[3*i-1].source = fc.v2
-        es[3*i].source   = fc.v3
+        es[3*i-2] = HalfEdge(fc.v1,0,0)
+        es[3*i-1] = HalfEdge(fc.v2,0,0)
+        es[3*i]   = HalfEdge(fc.v3,0,0)
 
         # set nexts
         es[3*i-2].next = 3*i-1
@@ -271,23 +309,20 @@ end
 # mesh simplification based on vertex quadric error
 #
 
+typealias Plane Vector4{Float64}
+
 # Given three vertices, determines coefficients of the
 # corresponding plane equation
 function plane(v1::Vertex,v2::Vertex,v3::Vertex)
-    e1 = v1-v2
-    e2 = v3-v2
-    p = zeros(4)
-    p[1] = e1.y*e2.z-e1.z*e2.y
-    p[2] = e1.z*e2.x-e1.x*e2.z
-    p[3] = e1.x*e2.y-e1.y*e2.x
-    p /= sqrt(dot(p,p)) # normalize
-    p[4] = -(p[1]*v2.x+p[2]*v2.y+p[3]*v2.z)
-    p
+    n = unit(cross(v1-v2,v3-v2))
+    d = dot(n,v2)
+    p = Plane(n.e1,n.e2,n.e3,-d)
 end
 
 # determines an error quadric associated with the given vertex
+typealias Quadric Matrix4x4{Float64}
 function quadric(cm::CollapsibleMesh, v::Int64)
-    q = zeros(4,4)
+    q = zero(Quadric)
     if !isBoundaryVertex(cm,v)
         e = edge(cm,v)
         @forEachEdge cm e begin
@@ -298,23 +333,95 @@ function quadric(cm::CollapsibleMesh, v::Int64)
             p = plane(v1,v2,v3)
 
             # accumulate the outer product
-            for i = 1:4, j = 1:4
-                q[i,j] += p[i]*p[j]
-            end
+            q += column(p)*row(p)
         end
     end
     q
 end
 
+function edgeCost(cm,qs,e)
+    p1 = position(cm,source(cm,e))
+    p2 = position(cm,target(cm,e))
+    p  = 0.5*(p1+p2)
+    hp = Plane(v.e1,v.e2,v.e3,v.e4,1.0)
+    c = hp*(qs[source(cm,e))]+qs[target(cm,e)])*hp
+    (c,p)
+end
+
 # helper type for edge heap
 immutable HeapNode
-    cost :: Float64
-    edge :: Int64
+    cost     :: Float64
+    edge     :: Int64
+    position :: Vertex
+    HeapNode(c,e,p) = new(c,e,p)
 end
 <(hn1::HeapNode,hn2::HeapNode) = hn1.cost < hn2.cost
 using DataStructures
 
-
 function simplify(msh::Mesh,eps::Float64)
+    # to a collapsible mesh
+    cm = CollapsibleMesh(msh)
+
+    # calculate the initial vertex quadrics
+    nV = length(cm.vPositions)
+    qs = Array(Quadric,nV)
+    for v = 1:nV
+        qs[v] = quadric(cm,v)
+    end
+
+    # initialize the edge heap
+    h = mutable_binary_minheap(HeapNode)
+    nE = length(cm.edges)
+    ks = zeros(Int,nE) # keys into the heap
+
+    # a convenience closure : recalculate the cost
+    # of the edge and update the heap
+    function updateCost(e)
+        if isCollapsibleEdge(cm,e)
+            (c,p) = edgeCost(cm,qs,e)
+            if c <= eps
+                hn = HeapNode(c,e,p)
+                if ks[e] != 0
+                    update!(h, ks[e], hn)
+                else
+                    ks[e] = push!(h, hn)
+                end
+            end
+        end
+    end
+
+    # add all the appropriate edges to the heap
+    for e = 1:nE
+        updateCost(e)
+    end
+
+    # simplify
+    while top(h).cost <= eps
+        hn = pop!(h)
+        e = hn.edge
+        p = hn.position
+
+        src = source(cm,e)
+        tgt = target(cm,e)
+
+        if collapse!(e)
+            # update the quadric
+            qs[tgt] += qs[src]
+
+            # update neighbor edges in the heap
+            e = edge(cm,v)
+            @forEachEdge cm e begin
+                updateCost(e)
+                updateCost(next(cm,e))
+                updateCost(previous(cm,e))
+                if !isBoundaryEdge(cm,next(cm,e))
+                    updateCost(opposite(cm,next(cm,e)))
+                end
+            end
+        end
+    end
     
+    # from a collapsible mesh
+    Mesh(cm)
 end
+export simplify

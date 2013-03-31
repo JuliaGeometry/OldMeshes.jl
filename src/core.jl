@@ -1,17 +1,19 @@
-using Geometry
+using ImmutableArrays
+
+typealias Vertex Vector3{Float64}
 
 immutable Face
     v1 :: Int64
     v2 :: Int64
     v3 :: Int64
 end
-export Face
 
 type Mesh
-    vertices :: Vector{Point3d}
+    vertices :: Vector{Vertex}
     faces :: Vector{Face}
 end
-export Mesh
+
+export Vertex, Face, Mesh
 
 # concatenates two meshes
 function merge(m1::Mesh, m2::Mesh)

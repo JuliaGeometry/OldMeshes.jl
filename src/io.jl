@@ -18,9 +18,9 @@ function exportToPly(msh::Mesh, fn::String)
     # write the data
     for i = 1:nV
         v = vts[i]
-        write(str,float32(v.x))
-        write(str,float32(v.y))
-        write(str,float32(v.z))
+        write(str,float32(v.e1))
+        write(str,float32(v.e2))
+        write(str,float32(v.e3))
     end
 
    for i = 1:nF
