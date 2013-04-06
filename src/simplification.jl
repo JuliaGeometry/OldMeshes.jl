@@ -55,11 +55,14 @@ clockwise(cm,e) = next(cm,opposite(cm,e))
 # clockwise edge iterator
 macro forEachEdge(cm,e,body)
     quote
-        local ee = e
+        ee = $(esc(e))
+        println($(esc(e)))
         while true
-            $body
-            e = clockwise(cm,e)
-            if e == ee; break; end
+            $(esc(body))
+            $(esc(e)) = clockwise($(esc(cm)),$(esc(e)))
+            if $(esc(e)) == ee
+                break
+            end
         end
     end
 end
@@ -70,7 +73,11 @@ isDeletedVertex(cm,v) = edge(cm,v) == 0
 isBoundaryEdge(cm,e) = opposite(cm,e) == 0
 function isBoundaryVertex(cm,v)
     e = edge(cm,v)
-    @forEachEdge cm e if isBoundaryEdge(cm,e); return true; end
+    @forEachEdge cm e begin
+        if isBoundaryEdge(cm,e)
+            return true
+        end
+    end
     false
 end
 function isCollapsibleEdge(cm,e)
@@ -111,7 +118,7 @@ end
 # edge collapse
 function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
         
-    if !isCollapsible(cm,e) return false end
+    if !isCollapsibleEdge(cm,e) return false end
 
     # id the relevant edges, vertices
     # 
@@ -149,7 +156,7 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     function causesInversion(e)
         v0 = source(cm,e)
         v1 = target(cm,e)
-        v2 = target(cm,next(e))
+        v2 = target(cm,next(cm,e))
         p0 = position(cm,v0)
         p1 = position(cm,v1)
         p2 = position(cm,v2)
@@ -343,8 +350,8 @@ function edgeCost(cm,qs,e)
     p1 = position(cm,source(cm,e))
     p2 = position(cm,target(cm,e))
     p  = 0.5*(p1+p2)
-    hp = Plane(v.e1,v.e2,v.e3,v.e4,1.0)
-    c = hp*(qs[source(cm,e))]+qs[target(cm,e)])*hp
+    hp = Plane(p.e1,p.e2,p.e3,1.0)
+    c = hp*(qs[source(cm,e)]+qs[target(cm,e)])*hp
     (c,p)
 end
 
@@ -404,7 +411,7 @@ function simplify(msh::Mesh,eps::Float64)
         src = source(cm,e)
         tgt = target(cm,e)
 
-        if collapse!(e)
+        if collapse!(cm,e,p)
             # update the quadric
             qs[tgt] += qs[src]
 
