@@ -56,7 +56,6 @@ clockwise(cm,e) = next(cm,opposite(cm,e))
 macro forEachEdge(cm,e,body)
     quote
         ee = $(esc(e))
-        println($(esc(e)))
         while true
             $(esc(body))
             $(esc(e)) = clockwise($(esc(cm)),$(esc(e)))
@@ -153,10 +152,10 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     vr = source(cm,op)
 
     # check that the new vertex position doesn't cause an inversion. 
-    function causesInversion(e)
-        v0 = source(cm,e)
-        v1 = target(cm,e)
-        v2 = target(cm,next(cm,e))
+    function causesInversion(ee)
+        v0 = source(cm,ee)
+        v1 = target(cm,ee)
+        v2 = target(cm,next(cm,ee))
         p0 = position(cm,v0)
         p1 = position(cm,v1)
         p2 = position(cm,v2)
@@ -178,7 +177,7 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
 
     # circle target vertex
     ee = o
-    @forEachEdge cm o begin
+    @forEachEdge cm ee begin
         if ee != o && ee != en
             if causesInversion(ee)
                 return false
@@ -188,17 +187,18 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
 
     # now perform the actual collapse...
 
+    # ensure all the edges emanating from the source vertex
+    # now emanate from the target vertex
+    ee = e
+    @forEachEdge cm ee begin
+        cm.edges[ee].source = tgt
+    end
+
     # fix up the edge opposites for the edges that remain
     cm.edges[epo].opposite = eno;
     cm.edges[eno].opposite = epo;
     cm.edges[opo].opposite = ono;
     cm.edges[ono].opposite = opo;
-
-    # ensure all the edges emanating from the source vertex
-    # now emanate from the target vertex
-    @forEachEdge cm e begin
-        cm.edges[e].source = tgt
-    end
 
     # ensure the three remaining vertices point to edges that remain
     cm.vEdges[tgt] = opo
@@ -206,7 +206,7 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     cm.vEdges[vr] = ono
 
     # update the remaining vertex position
-    cm.vPositions[target(cm,e)] = pos;
+    cm.vPositions[tgt] = pos;
 
     # delete the vertex and edges
     cm.vEdges[src] = 0
@@ -403,7 +403,7 @@ function simplify(msh::Mesh,eps::Float64)
     end
 
     # simplify
-    while top(h).cost <= eps
+    while !isempty(h) && top(h).cost <= eps
         hn = pop!(h)
         e = hn.edge
         p = hn.position
@@ -416,7 +416,7 @@ function simplify(msh::Mesh,eps::Float64)
             qs[tgt] += qs[src]
 
             # update neighbor edges in the heap
-            e = edge(cm,v)
+            e = edge(cm,tgt)
             @forEachEdge cm e begin
                 updateCost(e)
                 updateCost(next(cm,e))
