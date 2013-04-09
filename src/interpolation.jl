@@ -11,8 +11,8 @@ export IndexedFaceSet, IndexedFace, AFace, FaceSet
 
 
 # | interpolate z-value of the vertices from one  'Mesh' to another 'Mesh'
-function interpolateZ(from::IndexedFaceSet,to::IndexedFaceSet) # :: IndexedFaceSet
-    IndexedFaceSet(interpolateZ(from.vertices, to),from.faces)
+function interpolateZ(m::IndexedFaceSet,from::IndexedFaceSet) # :: IndexedFaceSet
+    IndexedFaceSet(interpolateZ(m.vertices, from),m.faces)
 end
 
 # | Interpolate elevation of a set of xy-vertices from an 'IndexedFaceSet'
