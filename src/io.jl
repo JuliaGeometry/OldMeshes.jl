@@ -67,7 +67,7 @@ export import2dm
 # | Write @Mesh@ to an IOStream
 function exportTo2dm(f::IO,m::Mesh)
     function renderVertex(i::Int,v::Vertex)
-        "ND $i $(v.x) $(v.y) $(v.z)\n"
+        "ND $i $(v.e1) $(v.e2) $(v.e3)\n"
     end
     function renderFace(i::Int, f::Face)
         "E3T $i $(f.v1) $(f.v2) $(f.v3) 0\n"
