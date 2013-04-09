@@ -1,8 +1,3 @@
-# | interpolate Vertices from one  'Mesh' to another 'Mesh'
-#
-#   The algorithm works like that: 
-#   1. For all vertices of 'to' look if they are inside a face of 'Mesh' 'from'
-#   2. If they do interpolate elevation form face; if not keep the old
 typealias IndexedFaceSet Mesh
 typealias IndexedFace Face
 type AFace
@@ -15,39 +10,40 @@ typealias FaceSet Vector{AFace}
 export IndexedFaceSet, IndexedFace, AFace, FaceSet
 
 
-function interpolate(from::IndexedFaceSet,to::IndexedFaceSet) # :: IndexedFaceSet
-    IndexedFaceSet(interpolate(from.vertices, to),from.faces)
+# | interpolate z-value of the vertices from one  'Mesh' to another 'Mesh'
+function interpolateZ(from::IndexedFaceSet,to::IndexedFaceSet) # :: IndexedFaceSet
+    IndexedFaceSet(interpolateZ(from.vertices, to),from.faces)
 end
 
 # | Interpolate elevation of a set of xy-vertices from an 'IndexedFaceSet'
-function interpolate(vs::Vector{Vertex}, m :: IndexedFaceSet) # :: Vector{Vertex}
+function interpolateZ(vs::Vector{Vertex}, m :: IndexedFaceSet) # :: Vector{Vertex}
     vsn = Vertex[]
     for v = vs
         fc = filter(x -> contains(x,v), [AFace(f,m.vertices) for f = m.faces])
         if length(fc) == 0
             push!(vsn,v)
         else    
-            push!(vsn,interpolate(v,fc[1]))
+            push!(vsn,interpolateZ(v,fc[1]))
         end 
     end
     vsn
 end
 
 # | Interpolate the elevation of 'Vertex' from a 'IndexedFace'
-function interpolate(v::Vertex, f::AFace) # :: Vertex
+function interpolateZ(v::Vertex, f::AFace) # :: Vertex
     if contains(f,v)
-        interpolate(v, plane(f.v1, f.v2, f.v3))
+        interpolateZ(v, plane(f.v1, f.v2, f.v3))
     else
         v
     end
 end
 
 # | Interpolate the elevation 
-function interpolate(v::Vertex,p::Plane) # :: Vertex
+function interpolateZ(v::Vertex,p::Plane) # :: Vertex
     z = -((p.e1*v.e1 + p.e2*v.e2 + p.e4)/p.e3)
     Vertex(v.e1, v.e2, z)
 end
-export  interpolate
+export  interpolateZ
 
 import Base.sign
 function sign(v1::Vertex,v2::Vertex,v3::Vertex)
