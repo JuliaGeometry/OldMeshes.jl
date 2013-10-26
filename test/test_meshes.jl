@@ -7,7 +7,7 @@ using Meshes
 # tight surface in all cases (unlike standard marching cubes).
 #
 N = 10
-sigma = 3.0
+sigma = 1.0
 distance = Float32[ sqrt(float32(i*i+j*j+k*k)) for i = -N:N, j = -N:N, k = -N:N ]
 distance = distance + sigma*rand(2*N+1,2*N+1,2*N+1)
 
