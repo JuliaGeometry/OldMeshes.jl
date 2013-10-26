@@ -8,21 +8,26 @@ immutable Face
     v3 :: Int64
 end
 
-type Mesh
+abstract AbstractMesh
+
+type Mesh <: AbstractMesh
     vertices :: Vector{Vertex}
     faces :: Vector{Face}
 end
 
-export Vertex, Face, Mesh
+vertices(m::Mesh) = m.vertices
+faces(m::Mesh) = m.faces
 
 # concatenates two meshes
-function merge(m1::Mesh, m2::Mesh)
-    v1 = copy(m1.vertices)
-    f1 = copy(m1.faces)
+function merge(m1::AbstractMesh, m2::AbstractMesh)
+    v1 = vertices(m1)
+    f1 = faces(m1)
+    v2 = vertices(m2)
+    f2 = faces(m2)
     nV = size(v1,1)
-    f2 = m2.faces
     nF = size(f2,1)
     newF2 = Face[ Face(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
-    Mesh(append!(v1,m2.vertices),append!(f1,newF2))
+    Mesh(append!(v1,v2),append!(f1,newF2))
 end
-export merge
+
+export Vertex, Face, AbstrctMesh, Mesh, vertices, faces, merge

@@ -177,7 +177,7 @@ function getVertId{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
                             vals::Vector{T}, iso::T,
                             vts::Dict{Int64,Vertex})
     vId = vertId(e,x,y,z,nx,ny)
-    if !has(vts,vId)
+    if !haskey(vts,vId)
         vts[vId] = vertPos(e,x,y,z,vals,iso)
     end
     vId
