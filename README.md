@@ -1,5 +1,7 @@
 # Meshes.jl
 
+[![Build Status](https://travis-ci.org/twadleigh/Meshes.jl.png)](https://travis-ci.org/twadleigh/Meshes.jl)
+
 Generation and manipulation of triangular meshes.
 
 ## Features
