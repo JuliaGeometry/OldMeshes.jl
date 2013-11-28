@@ -34,6 +34,43 @@ function exportToPly(msh::Mesh, fn::String)
 end
 export exportToPly
 
+function exportToStl(msh::Mesh, fn::String)
+    vts = msh.vertices
+    fcs = msh.faces
+    nV = size(vts,1)
+    nF = size(fcs,1)
+
+    str = open(fn,"w")
+
+    # write the header
+    write(str,"solid vcg\n")
+
+    # write the data
+    for i = 1:nF
+        f = fcs[i]
+        write(str,"  facet normal -1.837539e-01 -9.279602e-01  3.242290e-01\n")
+        write(str,"    outer loop\n")
+        v = vts[f.v1]
+        txt = @sprintf "      vertex  %e %e %e\n" v[1] v[2] v[3]
+        write(str,txt)
+
+        v = vts[f.v2]
+        txt = @sprintf "      vertex  %e %e %e\n" v[1] v[2] v[3]
+        write(str,txt)
+
+        v = vts[f.v3]
+        txt = @sprintf "      vertex  %e %e %e\n" v[1] v[2] v[3]
+        write(str,txt)
+
+        write(str,"    endloop\n")
+        write(str,"  endfacet\n")
+    end
+
+    write(str,"endsolid vcg\n")
+    close(str)
+end
+export exportToStl
+
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(file::String)
     parseNode(w::Array{String}) = Vertex(float64(w[3]), float64(w[4]), float64(w[5]))
