@@ -37,7 +37,8 @@ function testUnionNotInterection()
 	# creates Union, Not, Intersection of cube and sphere
 	# 
 	# http://en.wikipedia.org/wiki/Constructive_solid_geometry
-	
+
+	tic()	
 	# volume of interest
 	x_min, x_max = -1, 15
 	y_min, y_max = -1, 5
@@ -55,12 +56,24 @@ function testUnionNotInterection()
 	f3(x,y,z) = max(b3(x,y,z), s3(x,y,z))  # INTERSECTION
 	f(x,y,z) = min(f1(x,y,z), f2(x,y,z), f3(x,y,z))
 
-	volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
+	vol = volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
+	msh = isosurface(vol, 0.0)
+	exportToStl(msh, "wiki_csg.stl")
+	toc()
 end
+testUnionNotInterection()
 
-tic()
-vol = testUnionNotInterection()
-msh = isosurface(vol, 0.0)
-exportToStl(msh,"wiki_csg.stl")
-toc()
 
+function testCylinders()
+	tic()
+	c1(x,y,z) = cylinderX(x,y,z, 0,0,1,-2,4)
+	c2(x,y,z) = cylinderY(x,y,z, 0,0,1,-2,4)
+	c3(x,y,z) = cylinderZ(x,y,z, 0,0,1,-2,4)
+	f(x,y,z) = min(c1(x,y,z), c2(x,y,z), c3(x,y,z))
+
+	vol = volume(f, -3,-3,-3, 5,5,5, 2)
+	msh = isosurface(vol, 0.0)
+	exportToStl(msh, "cylinders_test.stl")
+	toc()
+end
+testCylinders()
