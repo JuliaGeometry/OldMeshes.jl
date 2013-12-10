@@ -32,6 +32,20 @@ function sphere(x,y,z, sx,sy,sz,sr)
 end
 export sphere
 
+function cylinderX(x,y,z, cy,cz,cr,cxmin,cxmax)
+	vr = hypot(y-cy,z-cz) - cr
+	vx = max(cxmin-x, x-cxmax)
+	max(vr,vx)
+end
+export cylinderX
+
+function cylinderY(x,y,z, cx,cz,cr,cymin,cymax)
+	vr = hypot(x-cx,z-cz) - cr
+	vy = max(cymin-y, y-cymax)
+	max(vr,vy)
+end
+export cylinderY
+
 function cylinderZ(x,y,z, cx,cy,cr,czmin,czmax)
 	vr = hypot(x-cx,y-cy) - cr
 	vz = max(czmin-z, z-czmax)

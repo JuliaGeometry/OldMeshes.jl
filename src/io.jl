@@ -48,7 +48,9 @@ function exportToStl(msh::Mesh, fn::String)
     # write the data
     for i = 1:nF
         f = fcs[i]
-        write(str,"  facet normal -1.837539e-01 -9.279602e-01  3.242290e-01\n")
+        n = [0,0,0] # TODO: properly compute normal(f)
+        txt = @sprintf "  facet normal %e %e %e\n" n[1] n[2] n[3]
+        write(str,txt)
         write(str,"    outer loop\n")
         v = vts[f.v1]
         txt = @sprintf "      vertex  %e %e %e\n" v[1] v[2] v[3]
