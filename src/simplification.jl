@@ -26,9 +26,9 @@
 # admits edge collapse.
 #
 type HalfEdge
-    source   :: Int64 # vertex index at the root of the half-edge
-    next     :: Int64 # the next edge in this (oriented) face
-    opposite :: Int64 # the other edge in the adjoining face (if not on bdy)
+    src :: Int64 # vertex index at the root of the half-edge
+    nxt :: Int64 # the next edge in this (oriented) face
+    opp :: Int64 # the other edge in the adjoining face (if not on bdy)
     HalfEdge(s,n,o) = new(s,n,o)
 end
 
@@ -39,54 +39,40 @@ type CollapsibleMesh
 end
 
 # vertex accessors
-edge(cm,v) = cm.vEdges[v]
-position(cm,v) = cm.vPositions[v]
+edg(cm::CollapsibleMesh,v::Int64) = cm.vEdges[v]
+pos(cm::CollapsibleMesh,v::Int64) = cm.vPositions[v]
 
 # edge accessors
-source(cm,e) = cm.edges[e].source
-next(cm,e) = cm.edges[e].next
-opposite(cm,e) = cm.edges[e].opposite
+src(cm::CollapsibleMesh,e::Int64) = cm.edges[e].src
+nxt(cm::CollapsibleMesh,e::Int64) = cm.edges[e].nxt
+opp(cm::CollapsibleMesh,e::Int64) = cm.edges[e].opp
+tgt(cm::CollapsibleMesh,e::Int64) = src(cm,nxt(cm,e))
+prv(cm::CollapsibleMesh,e::Int64) = nxt(cm,nxt(cm,e))
 
-# derived accessors
-target(cm,e) = source(cm,next(cm,e))
-previous(cm,e) = next(cm,next(cm,e))
-clockwise(cm,e) = next(cm,opposite(cm,e))
-
-# clockwise edge iterator
-macro forEachEdge(cm,e,body)
-    quote
-        ee = $(esc(e))
-        while true
-            $(esc(body))
-            $(esc(e)) = clockwise($(esc(cm)),$(esc(e)))
-            if $(esc(e)) == ee
-                break
-            end
-        end
-    end
+# clockwise edge iteration
+start(it::(CollapsibleMesh,Int64)) = (false,it[2])
+done(it::(CollapsibleMesh,Int64), st::(Bool,Int64)) =
+    st[1] && st[2] == it[2]
+function next(it::(CollapsibleMesh,Int64), st::(Bool,Int64))
+    nxt = next(it[1],opp(it[1],st[2]))
+    (nxt, (true,nxt))
 end
 
 # predicates
-isDeletedEdge(cm,e) = next(cm,e) == 0
-isDeletedVertex(cm,v) = edge(cm,v) == 0
-isBoundaryEdge(cm,e) = opposite(cm,e) == 0
-function isBoundaryVertex(cm,v)
-    e = edge(cm,v)
-    @forEachEdge cm e begin
+isDeletedEdge(cm::CollapsibleMesh,e::Int64) = nxt(cm,e) == 0
+isDeletedVertex(cm::CollapsibleMesh,v::Int64) = edg(cm,v) == 0
+isBoundaryEdge(cm::CollapsibleMesh,e::Int64) = opp(cm,e) == 0
+function isBoundaryVertex(cm::CollapsibleMesh,v::Int64)
+    for e = (cm,edg(cm,v))
         if isBoundaryEdge(cm,e)
             return true
         end
     end
     false
 end
-function isCollapsibleEdge(cm,e)
-
-    # assert edge and vertices aren't deleted
-    @assert !isDeletedEdge(cm,e)
-    src = source(cm,e)
-    tgt = target(cm,e)
-    @assert !isDeletedVertex(cm,src)
-    @assert !isDeletedVertex(cm,tgt)
+function isCollapsibleEdge(cm::CollapsibleMesh,e::Int64)
+    src = src(cm,e)
+    tgt = tgt(cm,e)
 
     # check for boundary
     if isBoundaryEdge(cm,e); return false; end
@@ -99,12 +85,14 @@ function isCollapsibleEdge(cm,e)
     # connected by an edge to both the source and target vertex.
 
     srcNbrs = IntSet()
-    se = edge(cm,src)
-    @forEachEdge cm se add!(srcNbrs,target(cm,se))
+    for se = (cm,edg(cm,src))
+        push!(srcNbrs,tgt(cm,se))
+    end
 
     tgtNbrs = IntSet()
-    te = edge(cm,tgt)
-    @forEachEdge cm te add!(tgtNbrs,target(cm,te))
+    for te = (cm,edg(cm,tgt))
+        push!(tgtNbrs,tgt(cm,te))
+    end
 
     if length(intersect(srcNbrs,tgtNbrs)) != 2; return false; end
 
@@ -137,51 +125,44 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
     #          +
     #          src
     #
-    en = next(cm,e)
-    eno = opposite(cm,en)
-    ep = previous(cm,e)
-    epo = opposite(cm,ep)
-    o = opposite(cm,e)
-    on = next(cm,o)
-    ono = opposite(cm,on)
-    op = previous(cm,o)
-    opo = opposite(cm,op)
-    src = source(cm,e)
-    tgt = source(cm,o)
-    vl = source(cm,ep)
-    vr = source(cm,op)
+    en = nxt(cm,e)
+    eno = opp(cm,en)
+    ep = prv(cm,e)
+    epo = opp(cm,ep)
+    o = opp(cm,e)
+    on = nxt(cm,o)
+    ono = opp(cm,on)
+    op = prv(cm,o)
+    opo = opp(cm,op)
+    src = src(cm,e)
+    tgt = src(cm,o)
+    vl = src(cm,ep)
+    vr = src(cm,op)
 
     # check that the new vertex position doesn't cause an inversion. 
-    function causesInversion(ee)
-        v0 = source(cm,ee)
-        v1 = target(cm,ee)
-        v2 = target(cm,next(cm,ee))
-        p0 = position(cm,v0)
-        p1 = position(cm,v1)
-        p2 = position(cm,v2)
+    function causesInversion(ee::Int64)
+        v0 = src(cm,ee)
+        v1 = tgt(cm,ee)
+        v2 = tgt(cm,nxt(cm,ee))
+        p0 = pos(cm,v0)
+        p1 = pos(cm,v1)
+        p2 = pos(cm,v2)
         n1 = unit(cross(p1-p0,p2-p0))
         n2 = unit(cross(p1-pos,p2-pos))
-        dot(n1,n2) <= 0
+        dot(n1,n2) < 0.01
     end
 
     # circle source vertex
-    ee = e
-    p0 = position(cm,src)
-    @forEachEdge cm ee begin
+    for ee = (cm,e)
         if ee != e && ee != on
-            if causesInversion(ee)
-                return false
-            end
+            if causesInversion(ee); return false; end
         end
     end
 
     # circle target vertex
-    ee = o
-    @forEachEdge cm ee begin
+    for ee = (cm,o)
         if ee != o && ee != en
-            if causesInversion(ee)
-                return false
-            end
+            if causesInversion(ee); return false; end
         end
     end
 
@@ -189,16 +170,15 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
 
     # ensure all the edges emanating from the source vertex
     # now emanate from the target vertex
-    ee = e
-    @forEachEdge cm ee begin
-        cm.edges[ee].source = tgt
+    for ee = (cm,e)
+        cm.edges[ee].src = tgt
     end
 
-    # fix up the edge opposites for the edges that remain
-    cm.edges[epo].opposite = eno;
-    cm.edges[eno].opposite = epo;
-    cm.edges[opo].opposite = ono;
-    cm.edges[ono].opposite = opo;
+    # fix up the edge opps for the edges that remain
+    cm.edges[epo].opp = eno;
+    cm.edges[eno].opp = epo;
+    cm.edges[opo].opp = ono;
+    cm.edges[ono].opp = opo;
 
     # ensure the three remaining vertices point to edges that remain
     cm.vEdges[tgt] = opo
@@ -210,14 +190,14 @@ function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
 
     # delete the vertex and edges
     cm.vEdges[src] = 0
-    cm.edges[ep].next = 0
-    cm.edges[en].next = 0
-    cm.edges[e].next = 0
-    cm.edges[op].next = 0
-    cm.edges[on].next = 0
-    cm.edges[o].next = 0
+    cm.edges[ep].nxt = 0
+    cm.edges[en].nxt = 0
+    cm.edges[e].nxt = 0
+    cm.edges[op].nxt = 0
+    cm.edges[on].nxt = 0
+    cm.edges[o].nxt = 0
 
-    return true
+    true
 end
 
 ###########################################################
@@ -226,9 +206,10 @@ end
 #
 
 # construction from a vanilla mesh
-function CollapsibleMesh(m::Mesh)
-    vts = m.vertices
-    fcs = m.faces
+function CollapsibleMesh(m::GeometricMesh)
+    msh = mesh(m)
+    vts = msh.vertices
+    fcs = msh.faces
 
     nVts = length(vts)
     nFcs = length(fcs)
@@ -251,10 +232,10 @@ function CollapsibleMesh(m::Mesh)
         es[3*i-1] = HalfEdge(fc.v2,0,0)
         es[3*i]   = HalfEdge(fc.v3,0,0)
 
-        # set nexts
-        es[3*i-2].next = 3*i-1
-        es[3*i-1].next = 3*i
-        es[3*i].next   = 3*i-2
+        # set nxts
+        es[3*i-2].nxt = 3*i-1
+        es[3*i-1].nxt = 3*i
+        es[3*i].nxt   = 3*i-2
 
         # add edges to dictionary
         edgeDict[(fc.v1,fc.v2)] = 3*i-2
@@ -262,25 +243,25 @@ function CollapsibleMesh(m::Mesh)
         edgeDict[(fc.v3,fc.v1)] = 3*i
     end
 
-    # fix up opposites
+    # fix up opps
     for i = 1:3*nFcs
-        src = es[i].source
-        tgt = es[es[i].next].source
-        es[i].opposite = get(edgeDict,(tgt,src),0)
+        src = es[i].src
+        tgt = es[es[i].nxt].src
+        es[i].opp = get(edgeDict,(tgt,src),0)
     end
 
     CollapsibleMesh(vts,vs,es)
 end
 
 # conversion to a vanilla mesh
-function Mesh(cm::CollapsibleMesh)
+function mesh(cm::CollapsibleMesh)
 
     # collect vertex indices
     nVold = length(cm.vEdges)
     vs = IntSet()
     for v = 1:nVold
         if !isDeletedVertex(cm,v)
-            add!(vs,v)
+            push!(vs,v)
         end
     end
 
@@ -290,7 +271,7 @@ function Mesh(cm::CollapsibleMesh)
     invV = zeros(Int64,nVold)
     ix = 1
     for v = vs
-        vts[ix] = position(cm,v)
+        vts[ix] = pos(cm,v)
         invV[v] = ix
         ix += 1
     end
@@ -301,15 +282,16 @@ function Mesh(cm::CollapsibleMesh)
     for e = 1:3:nE
         if !isDeletedEdge(cm,e)
             # make and push face
-            v1 = invV[source(cm,e)]
-            v2 = invV[source(cm,e+1)]
-            v3 = invV[source(cm,e+2)]
+            v1 = invV[src(cm,e)]
+            v2 = invV[src(cm,e+1)]
+            v3 = invV[src(cm,e+2)]
             push!(fcs,Face(v1,v2,v3))
         end
     end
 
     Mesh(vts,fcs)
 end
+
 
 ##########################################################
 #
@@ -329,14 +311,15 @@ end
 # determines an error quadric associated with the given vertex
 typealias Quadric Matrix4x4{Float64}
 function quadric(cm::CollapsibleMesh, v::Int64)
-    q = zero(Quadric)
+    u = unit(Plane,4)
+    q = 1.0e-3*column(u)*row(u) # start with a small constant
+    
     if !isBoundaryVertex(cm,v)
-        e = edge(cm,v)
-        @forEachEdge cm e begin
+        for e = (cm,edg(cm,v))
             # determine the plane associated with the current face
-            v1 = position(cm,source(cm,e))
-            v2 = position(cm,source(cm,next(cm,e)))
-            v3 = position(cm,source(cm,previous(cm,e)))
+            v1 = pos(cm,src(cm,e))
+            v2 = pos(cm,src(cm,nxt(cm,e)))
+            v3 = pos(cm,src(cm,prv(cm,e)))
             p = plane(v1,v2,v3)
 
             # accumulate the outer product
@@ -346,12 +329,17 @@ function quadric(cm::CollapsibleMesh, v::Int64)
     q
 end
 
-function edgeCost(cm,qs,e)
-    p1 = position(cm,source(cm,e))
-    p2 = position(cm,target(cm,e))
+homog(p) = Plane(p.e1,p.e2,p.e3,1.0)
+
+function edgeCost(cm::CollapsibleMesh,qs::AbstractArray{Quadric,1},e::Int64)
+    src = src(cm,e)
+    tgt = tgt(cm,e)
+    p1 = pos(cm,src)
+    p2 = pos(cm,tgt)
     p  = 0.5*(p1+p2)
-    hp = Plane(p.e1,p.e2,p.e3,1.0)
-    c = hp*(qs[source(cm,e)]+qs[target(cm,e)])*hp
+    hp = homog(p)
+    q = qs[src]+qs[tgt]
+    c = hp*q*hp
     (c,p)
 end
 
@@ -365,7 +353,7 @@ end
 <(hn1::HeapNode,hn2::HeapNode) = hn1.cost < hn2.cost
 using DataStructures
 
-function simplify(msh::Mesh,eps::Float64)
+function simplify(msh::GeometricMesh,decimation::Float64)
     # to a collapsible mesh
     cm = CollapsibleMesh(msh)
 
@@ -386,13 +374,11 @@ function simplify(msh::Mesh,eps::Float64)
     function updateCost(e)
         if isCollapsibleEdge(cm,e)
             (c,p) = edgeCost(cm,qs,e)
-            if c <= eps
-                hn = HeapNode(c,e,p)
-                if ks[e] != 0
-                    update!(h, ks[e], hn)
-                else
-                    ks[e] = push!(h, hn)
-                end
+            hn = HeapNode(c,e,p)
+            if ks[e] != 0
+                update!(h, ks[e], hn)
+            else
+                ks[e] = push!(h, hn)
             end
         end
     end
@@ -403,32 +389,43 @@ function simplify(msh::Mesh,eps::Float64)
     end
 
     # simplify
-    while !isempty(h) && top(h).cost <= eps
+    nDeleted = 0
+    nToDelete = int(nE*(1.0-decimation))
+    while !isempty(h) && nDeleted < nToDelete
         hn = pop!(h)
         e = hn.edge
         p = hn.position
+        ks[e] = 0
 
-        src = source(cm,e)
-        tgt = target(cm,e)
+        if isDeletedEdge(cm,e)
+            continue
+        end
+        
+        src = src(cm,e)
+        tgt = tgt(cm,e)
 
         if collapse!(cm,e,p)
+
             # update the quadric
             qs[tgt] += qs[src]
 
             # update neighbor edges in the heap
-            e = edge(cm,tgt)
-            @forEachEdge cm e begin
+            for e = (cm,edg(cm,tgt))
                 updateCost(e)
-                updateCost(next(cm,e))
-                updateCost(previous(cm,e))
-                if !isBoundaryEdge(cm,next(cm,e))
-                    updateCost(opposite(cm,next(cm,e)))
+                nxt = nxt(cm,e)
+                updateCost(nxt)
+                updateCost(nxt(cm,nxt))
+                if !isBoundaryEdge(cm,nxt)
+                    updateCost(opp(cm,nxt))
                 end
             end
+
+            # increment the collapse counter
+            nDeleted += 1
         end
     end
     
     # from a collapsible mesh
-    Mesh(cm)
+    mesh(cm)
 end
 export simplify

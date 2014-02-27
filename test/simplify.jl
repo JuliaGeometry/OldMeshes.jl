@@ -22,7 +22,7 @@ end
 msh = Mesh(vts,fcs)
 
 # simplify it
-simplify(msh,1.0)
+simplify(msh,0.1)
 
 # write it out
 exportToPly(msh,"grid.ply")
