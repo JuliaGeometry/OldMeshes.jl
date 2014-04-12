@@ -162,6 +162,8 @@ function vertPos{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
     srcVal = float(vals[ixs[1]])
     tgtVal = float(vals[ixs[2]])
     a = (float(iso)-srcVal)/(tgtVal-srcVal)
+    const EPS = 0.001
+    a = min(max(a,EPS),1.0-EPS)
     b = 1.0-a
     org = float([x,y,z])
     src = org+float(voxCrnrPos[:,ixs[1]])
