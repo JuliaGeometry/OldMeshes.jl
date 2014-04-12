@@ -46,7 +46,6 @@ function clean(mesh::Mesh)
     faces = Face[]
     vertices = Vertex[]
     n = length(mesh.faces)
-    prg = Progress(n, 1.0, "Cleaning mesh...", 40)
     for i=1:n
         fi = mesh.faces[i]
         v1 = mesh.vertices[fi.v1]
@@ -74,7 +73,6 @@ function clean(mesh::Mesh)
             iv3 = length(vertices)
         end
         push!(faces, Face(iv1,iv2,iv3))
-        next!(prg)
     end
     cleaned_mesh = Mesh(vertices, faces)
     return cleaned_mesh
