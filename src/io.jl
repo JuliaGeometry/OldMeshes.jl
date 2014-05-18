@@ -34,6 +34,53 @@ function exportToPly(msh::Mesh, fn::String)
 end
 export exportToPly
 
+function importPly(fn::String)
+    vts = Vertex[]
+    fcs = Face[]
+
+    str = open(fn,"r")
+
+    # read the header
+    txt0 = readline(str)   # ply
+    txt1 = readline(str)   # format ascii 1.0
+    txt2 = readline(str)   # element vertex 352
+    txt3 = readline(str)   # property float32 x
+    txt4 = readline(str)   # property float32 y
+    txt5 = readline(str)   # property float32 z
+
+    txt3 = readline(str)   # property float32 nx
+    txt4 = readline(str)   # property float32 ny
+    txt5 = readline(str)   # property float32 nz
+
+    txt6 = readline(str)   # element face 671
+    txt7 = readline(str)   # property list uint8 int32 vertex_indices
+    txt8 = readline(str)   # end_header
+
+    nV = int(split(txt2)[3])
+    nF = int(split(txt6)[3])
+
+    # write the data
+    for i = 1:nV
+        txt = readline(str)   # -0.018 0.038 0.086
+        vs = [float(i) for i in split(txt)]
+        push!(vts, Vertex(vs[1], vs[2], vs[3]))
+    end
+
+    for i = 1:nF
+        txt = readline(str)   # 3 0 1 2
+        fs = [int(i) for i in split(txt)]
+        if fs[1]!=3
+            println("Error, cannot read more than three vertex faces")
+            return nothing
+        end
+        push!(fcs, Face(fs[2]+1, fs[3]+1, fs[4]+1))
+    end
+    close(str)
+
+    return Mesh(vts, fcs)
+end
+export importPly
+
 function exportToStl(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
@@ -73,6 +120,39 @@ function exportToStl(msh::Mesh, fn::String)
 end
 export exportToStl
 
+function exportToOFF(msh::Mesh, fn::String, rgba)
+    # writes an OFF geometry file, with colors
+    #  see http://people.sc.fsu.edu/~jburkardt/data/off/off.html
+    #  for format description
+    vts = msh.vertices
+    fcs = msh.faces
+    nV = size(vts,1)
+    nF = size(fcs,1)
+    nE = nF*3
+
+    str = open(fn,"w")
+
+    # write the header
+    write(str,"OFF\n")
+    write(str,"$nV $nF $nE\n")
+
+    # write the data
+    for i = 1:nV
+        v = vts[i]
+        txt = @sprintf " %f %f %f\n" float32(v.e1) float32(v.e2) float32(v.e3)
+        write(str,txt)
+    end
+
+    for i = 1:nF
+        f = fcs[i]
+        c = rgba[i,:]
+        txt = @sprintf "  3 %i %i %i  %f %f %f %f\n" int32(f.v1-1) int32(f.v2-1) int32(f.v3-1)  float32(c[1]) float32(c[2]) float32(c[3]) float32(c[4])
+        write(str,txt)
+    end
+    close(str)
+end
+export exportToOFF
+
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(file::String)
     parseNode(w::Array{String}) = Vertex(float64(w[3]), float64(w[4]), float64(w[5]))
@@ -104,18 +184,19 @@ end
 export import2dm
 
 # | Write @Mesh@ to an IOStream
-function exportTo2dm(f::IO,m::Mesh)
+function exportTo2dm(con::IO,m::Mesh)
     function renderVertex(i::Int,v::Vertex)
-        "ND $i $(v.x) $(v.y) $(v.z)\n"
+        "ND $i $(v.e1) $(v.e2) $(v.e3)\n"
     end
     function renderFace(i::Int, f::Face)
         "E3T $i $(f.v1) $(f.v2) $(f.v3) 0\n"
     end
+    write(con, "MESH2D\n")
     for i = 1:length(m.faces)
-        write(f, renderFace(i, m.faces[i]))
+        write(con, renderFace(i, m.faces[i]))
     end
     for i = 1:length(m.vertices)
-        write(f, renderVertex(i, m.vertices[i]))
+        write(con, renderVertex(i, m.vertices[i]))
     end
     nothing
 end

@@ -208,7 +208,7 @@ function procVox{T<:Real}(vals::Vector{T}, iso::T,
     for i = 1:6
         tIx = tetIx(i,vals,iso)
 
-        for j = Range(1,3,2)
+        for j in 1:3:4
             e1 = tetTri[j,tIx]
             e2 = tetTri[j+1,tIx]
             e3 = tetTri[j+2,tIx]
