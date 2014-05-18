@@ -156,12 +156,15 @@ end
 
 # Assuming an edge crossing, determines the point in space at which it
 # occurs.
+# eps represents the "bump" factor to keep vertices away from voxel
+# corners (thereby preventing degeneracies).
 function vertPos{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
-                          vals::Vector{T}, iso::T)
+                          vals::Vector{T}, iso::T, eps::T)
     ixs = voxEdgeCrnrs[:,e]
     srcVal = float(vals[ixs[1]])
     tgtVal = float(vals[ixs[2]])
     a = (float(iso)-srcVal)/(tgtVal-srcVal)
+    a = min(max(a,eps),1.0-eps)
     b = 1.0-a
     org = float([x,y,z])
     src = org+float(voxCrnrPos[:,ixs[1]])
@@ -175,10 +178,11 @@ end
 function getVertId{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
                             nx::Int64, ny::Int64,
                             vals::Vector{T}, iso::T,
-                            vts::Dict{Int64,Vertex})
+                            vts::Dict{Int64,Vertex},
+                            eps::T)
     vId = vertId(e,x,y,z,nx,ny)
     if !haskey(vts,vId)
-        vts[vId] = vertPos(e,x,y,z,vals,iso)
+        vts[vId] = vertPos(e,x,y,z,vals,iso,eps)
     end
     vId
 end
@@ -197,7 +201,8 @@ end
 function procVox{T<:Real}(vals::Vector{T}, iso::T,
                           x::Int64, y::Int64, z::Int64,
                           nx::Int64, ny::Int64,
-                          vts::Dict{Int64,Vertex}, fcs::Vector{Face})
+                          vts::Dict{Int64,Vertex}, fcs::Vector{Face},
+                          eps::T)
 
     # check each sub-tetrahedron in the voxel
     for i = 1:6
@@ -212,7 +217,7 @@ function procVox{T<:Real}(vals::Vector{T}, iso::T,
             if e1 == 0 break end
 
             # add the face to the list
-            vId(e) = getVertId(voxEdgeId(i,e),x,y,z,nx,ny,vals,iso,vts)
+            vId(e) = getVertId(voxEdgeId(i,e),x,y,z,nx,ny,vals,iso,vts,eps)
             push!(fcs,Face(vId(e1),vId(e2),vId(e3)))
         end
     end
@@ -220,7 +225,7 @@ end
 
 # Given a 3D array and an isovalue, extracts a mesh represention of the 
 # an approximate isosurface by the method of marching tetrahedra.
-function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
+function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T,eps::T)
     vts = Dict{Int64,Vertex}()
     fcs = Array(Face,0)
 
@@ -230,16 +235,16 @@ function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T)
         vals = T[lsf[i+voxCrnrPos[1,l],j+voxCrnrPos[2,l],k+voxCrnrPos[3,l]] 
                  for l = 1:8]
         if hasFaces(vals,iso)
-            procVox(vals,iso,i,j,k,nx,ny,vts,fcs)
+            procVox(vals,iso,i,j,k,nx,ny,vts,fcs,eps)
         end
     end
 
     (vts,fcs)
 end
 
-function isosurface(lsf,isoval)
+function isosurface(lsf,isoval,eps)
     # get marching tetrahedra version of the mesh
-    (vts,fcs) = marchingTetrahedra(lsf,isoval)
+    (vts,fcs) = marchingTetrahedra(lsf,isoval,eps)
 
     # normalize the mesh representation
     prs = collect(vts)
@@ -255,4 +260,7 @@ function isosurface(lsf,isoval)
 
     Mesh(vtAry,fcAry)
 end
+
+isosurface(lsf,isoval) = isosurface(lsf,isoval,0.001)
+        
 export isosurface
