@@ -3,7 +3,8 @@ export exportToPly,
        exportToOFF,
        exportToStl,
        import2dm,
-       exportTo2dm
+       exportTo2dm,
+       importBinarySTL
 
 function exportToPly(msh::Mesh, fn::String)
     vts = msh.vertices
@@ -124,6 +125,47 @@ function exportToStl(msh::Mesh, fn::String)
 
     write(str,"endsolid vcg\n")
     close(str)
+end
+
+
+function importBinarySTL(fn::String)
+    #Binary STL
+    #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
+
+    binarySTLvertex(file) = Vertex(read(file, Float32),
+                                   read(file, Float32),
+                                   read(file, Float32))
+
+    vts = Vertex[]
+    fcs = Face[]
+
+    file = open(fn,"r")
+
+    readbytes(file, 80) # throw out header
+    read(file, Uint32) # throwout triangle count
+
+    vert_count = 0
+    vert_idx = [0,0,0]
+    while !eof(file)
+        normal = binarySTLvertex(file)
+        for i = 1:3
+            vertex = binarySTLvertex(file)
+            idx = findfirst(vts, vertex)
+            if idx != 0
+                vert_idx[i] = idx
+            else
+                push!(vts, vertex)
+                vert_count += 1
+                vert_idx[i] = vert_count
+            end
+        end
+        skip(file, 2) # throwout 16bit attribute
+        push!(fcs, Face(vert_idx...))
+    end
+
+    close(file)
+
+    return Mesh(vts, fcs)
 end
 
 

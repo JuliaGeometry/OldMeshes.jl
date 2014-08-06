@@ -1,1 +1,4 @@
-require("test_meshes.jl")
+using Base.Test
+
+include("test_meshes.jl")
+include("test_imports.jl")
