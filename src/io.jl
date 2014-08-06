@@ -4,7 +4,8 @@ export exportToPly,
        exportToStl,
        import2dm,
        exportTo2dm,
-       importBinarySTL
+       importBinarySTL,
+       importAsciiSTL
 
 function exportToPly(msh::Mesh, fn::String)
     vts = msh.vertices
@@ -169,6 +170,47 @@ function importBinarySTL(fn::String; topology=false)
 
     return Mesh(vts, fcs, topology)
 end
+
+function importAsciiSTL(fn::String; topology=false)
+    #ASCII STL
+    #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
+
+    vts = Vertex[]
+    fcs = Face[]
+
+    file = open(fn,"r")
+
+    vert_count = 0
+    vert_idx = [0,0,0]
+    while !eof(file)
+        line = split(lowercase(readline(file)))
+        if line[1] == "facet"
+            normal = Vertex(float64(line[3:5])...)
+            readline(file) # Throw away outerloop
+            for i = 1:3
+                vertex = Vertex(float64(split(readline(file))[2:4])...)
+                if topology
+                    idx = findfirst(vts, vertex)
+                end
+                if topology && idx != 0
+                    vert_idx[i] = idx
+                else
+                    push!(vts, vertex)
+                    vert_count += 1
+                    vert_idx[i] = vert_count
+                end
+            end
+            readline(file) # throwout endloop
+            readline(file) # throwout endfacet
+            push!(fcs, Face(vert_idx...))
+        end
+    end
+
+    close(file)
+
+    return Mesh(vts, fcs, topology)
+end
+
 
 
 function exportToOFF(msh::Mesh, fn::String, rgba)
