@@ -167,7 +167,7 @@ function importBinarySTL(fn::String; topology=false)
 
     close(file)
 
-    return Mesh(vts, fcs)
+    return Mesh(vts, fcs, topology)
 end
 
 

@@ -21,7 +21,10 @@ abstract AbstractMesh
 type Mesh <: AbstractMesh
     vertices :: Vector{Vertex}
     faces :: Vector{Face}
+    has_topology :: Bool
 end
+
+Mesh(v,f) = Mesh(v,f, true)
 
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
