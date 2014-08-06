@@ -128,7 +128,7 @@ function exportToStl(msh::Mesh, fn::String)
 end
 
 
-function importBinarySTL(fn::String)
+function importBinarySTL(fn::String; topology=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
@@ -150,8 +150,10 @@ function importBinarySTL(fn::String)
         normal = binarySTLvertex(file)
         for i = 1:3
             vertex = binarySTLvertex(file)
-            idx = findfirst(vts, vertex)
-            if idx != 0
+            if topology
+                idx = findfirst(vts, vertex)
+            end
+            if topology && idx != 0
                 vert_idx[i] = idx
             else
                 push!(vts, vertex)
