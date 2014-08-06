@@ -25,6 +25,8 @@
 # A data structure representing a triangular mesh that
 # admits edge collapse.
 #
+export simplify
+
 type HalfEdge
     source   :: Int64 # vertex index at the root of the half-edge
     next     :: Int64 # the next edge in this (oriented) face
@@ -71,6 +73,7 @@ end
 isDeletedEdge(cm,e) = next(cm,e) == 0
 isDeletedVertex(cm,v) = edge(cm,v) == 0
 isBoundaryEdge(cm,e) = opposite(cm,e) == 0
+
 function isBoundaryVertex(cm,v)
     e = edge(cm,v)
     @forEachEdge cm e begin
@@ -80,6 +83,7 @@ function isBoundaryVertex(cm,v)
     end
     false
 end
+
 function isCollapsibleEdge(cm,e)
 
     # assert edge and vertices aren't deleted
@@ -431,4 +435,4 @@ function simplify(msh::Mesh,eps::Float64)
     # from a collapsible mesh
     Mesh(cm)
 end
-export simplify
+
