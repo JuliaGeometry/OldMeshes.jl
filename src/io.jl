@@ -133,9 +133,9 @@ function importBinarySTL(fn::String; topology=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
-    binarySTLvertex(file) = Vertex(read(file, Float32),
-                                   read(file, Float32),
-                                   read(file, Float32))
+    binarySTLvertex(file) = Vertex(float64(read(file, Float32)),
+                                   float64(read(file, Float32)),
+                                   float64(read(file, Float32)))
 
     vts = Vertex[]
     fcs = Face[]
