@@ -1,3 +1,6 @@
+export isosurface
+
+
 #
 # *** Marching Tetrahedra ***
 #
@@ -262,5 +265,4 @@ function isosurface(lsf,isoval,eps)
 end
 
 isosurface(lsf,isoval) = isosurface(lsf,isoval,0.001)
-        
-export isosurface
+

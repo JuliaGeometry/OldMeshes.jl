@@ -1,3 +1,12 @@
+export exportToPly,
+       importPly,
+       exportToOFF,
+       exportToStl,
+       import2dm,
+       exportTo2dm,
+       importBinarySTL,
+       importAsciiSTL
+
 function exportToPly(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
@@ -32,7 +41,7 @@ function exportToPly(msh::Mesh, fn::String)
     end
     close(str)
 end
-export exportToPly
+
 
 function importPly(fn::String)
     vts = Vertex[]
@@ -79,7 +88,7 @@ function importPly(fn::String)
 
     return Mesh(vts, fcs)
 end
-export importPly
+
 
 function exportToStl(msh::Mesh, fn::String)
     vts = msh.vertices
@@ -118,7 +127,91 @@ function exportToStl(msh::Mesh, fn::String)
     write(str,"endsolid vcg\n")
     close(str)
 end
-export exportToStl
+
+
+function importBinarySTL(fn::String; topology=false)
+    #Binary STL
+    #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
+
+    binarySTLvertex(file) = Vertex(read(file, Float32),
+                                   read(file, Float32),
+                                   read(file, Float32))
+
+    vts = Vertex[]
+    fcs = Face[]
+
+    file = open(fn,"r")
+
+    readbytes(file, 80) # throw out header
+    read(file, Uint32) # throwout triangle count
+
+    vert_count = 0
+    vert_idx = [0,0,0]
+    while !eof(file)
+        normal = binarySTLvertex(file)
+        for i = 1:3
+            vertex = binarySTLvertex(file)
+            if topology
+                idx = findfirst(vts, vertex)
+            end
+            if topology && idx != 0
+                vert_idx[i] = idx
+            else
+                push!(vts, vertex)
+                vert_count += 1
+                vert_idx[i] = vert_count
+            end
+        end
+        skip(file, 2) # throwout 16bit attribute
+        push!(fcs, Face(vert_idx...))
+    end
+
+    close(file)
+
+    return Mesh(vts, fcs, topology)
+end
+
+function importAsciiSTL(fn::String; topology=false)
+    #ASCII STL
+    #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
+
+    vts = Vertex[]
+    fcs = Face[]
+
+    file = open(fn,"r")
+
+    vert_count = 0
+    vert_idx = [0,0,0]
+    while !eof(file)
+        line = split(lowercase(readline(file)))
+        if line[1] == "facet"
+            normal = Vertex(float64(line[3:5])...)
+            readline(file) # Throw away outerloop
+            for i = 1:3
+                vertex = Vertex(float64(split(readline(file))[2:4])...)
+                if topology
+                    idx = findfirst(vts, vertex)
+                end
+                if topology && idx != 0
+                    vert_idx[i] = idx
+                else
+                    push!(vts, vertex)
+                    vert_count += 1
+                    vert_idx[i] = vert_count
+                end
+            end
+            readline(file) # throwout endloop
+            readline(file) # throwout endfacet
+            push!(fcs, Face(vert_idx...))
+        end
+    end
+
+    close(file)
+
+    return Mesh(vts, fcs, topology)
+end
+
+
 
 function exportToOFF(msh::Mesh, fn::String, rgba)
     # writes an OFF geometry file, with colors
@@ -151,7 +244,7 @@ function exportToOFF(msh::Mesh, fn::String, rgba)
     end
     close(str)
 end
-export exportToOFF
+
 
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(file::String)
@@ -181,7 +274,7 @@ function import2dm(file::String)
     close(con)
     Mesh(nd,ele)
 end
-export import2dm
+
 
 # | Write @Mesh@ to an IOStream
 function exportTo2dm(con::IO,m::Mesh)
@@ -208,4 +301,3 @@ function exportTo2dm(f::String,m::Mesh)
     close(con)
     nothing
 end
-export exportTo2dm

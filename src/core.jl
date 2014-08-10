@@ -1,5 +1,13 @@
 using ImmutableArrays
 
+export Vertex,
+       Face,
+       AbstractMesh,
+       Mesh,
+       vertices,
+       faces,
+       merge
+
 typealias Vertex Vector3{Float64}
 
 immutable Face
@@ -13,7 +21,10 @@ abstract AbstractMesh
 type Mesh <: AbstractMesh
     vertices :: Vector{Vertex}
     faces :: Vector{Face}
+    has_topology :: Bool
 end
+
+Mesh(v,f) = Mesh(v,f, true)
 
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
@@ -29,5 +40,3 @@ function merge(m1::AbstractMesh, m2::AbstractMesh)
     newF2 = Face[ Face(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
     Mesh(append!(v1,v2),append!(f1,newF2))
 end
-
-export Vertex, Face, AbstrctMesh, Mesh, vertices, faces, merge
