@@ -37,30 +37,28 @@ function exportToPly(msh::Mesh, fn::String)
 end
 
 
-function importPly(fn::String)
+function importPly(fn::String; topology=false)
     vts = Vertex[]
     fcs = Face[]
 
     str = open(fn,"r")
 
+    nV = 0
+    nF = 0
+    properties = String[]
+
     # read the header
-    txt0 = readline(str)   # ply
-    txt1 = readline(str)   # format ascii 1.0
-    txt2 = readline(str)   # element vertex 352
-    txt3 = readline(str)   # property float32 x
-    txt4 = readline(str)   # property float32 y
-    txt5 = readline(str)   # property float32 z
-
-    txt3 = readline(str)   # property float32 nx
-    txt4 = readline(str)   # property float32 ny
-    txt5 = readline(str)   # property float32 nz
-
-    txt6 = readline(str)   # element face 671
-    txt7 = readline(str)   # property list uint8 int32 vertex_indices
-    txt8 = readline(str)   # end_header
-
-    nV = int(split(txt2)[3])
-    nF = int(split(txt6)[3])
+    line = readline(str)
+    while !beginswith(line, "end_header")
+        if beginswith(line, "element vertex")
+            nV = int(split(line)[3])
+        elseif beginswith(line, "element face")
+            nF = int(split(line)[3])
+        elseif beginswith(line, "property")
+            push!(properties, line)
+        end
+        line = readline(str)
+    end
 
     # write the data
     for i = 1:nV
@@ -72,14 +70,24 @@ function importPly(fn::String)
     for i = 1:nF
         txt = readline(str)   # 3 0 1 2
         fs = [int(i) for i in split(txt)]
-        if fs[1]!=3
-            println("Error, cannot read more than three vertex faces")
-            return nothing
+        for i = 3:length(fs)-1 #handle quads, etc...
+            push!(fcs, Face(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
-        push!(fcs, Face(fs[2]+1, fs[3]+1, fs[4]+1))
     end
     close(str)
 
-    return Mesh(vts, fcs)
+    if topology
+        uvts = unique(vts)
+        for i = 1:length(fcs)
+            #repoint indices to unique vertices
+            v1 = findfirst(uvts, vts[fcs[i].v1])
+            v2 = findfirst(uvts, vts[fcs[i].v2])
+            v3 = findfirst(uvts, vts[fcs[i].v3])
+            fcs[i] = Face(v1,v2,v3)
+        end
+        vts = uvts
+    end
+
+    return Mesh(vts, fcs, topology)
 end
 

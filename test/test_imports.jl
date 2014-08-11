@@ -21,3 +21,12 @@ ascii_stl1 = importAsciiSTL(data_path*"cube.stl", topology=false)
 @test length(ascii_stl1.vertices) == 36
 @test length(ascii_stl1.faces) == 12
 @test !ascii_stl1.has_topology
+
+ply1 = importPly(data_path*"cube.ply") # quads
+@test length(ply1.vertices) == 24
+@test length(ply1.faces) == 12
+
+ply1 = importPly(data_path*"cube.ply", topology=true) # quads
+@test length(ply1.vertices) == 8
+@test length(ply1.faces) == 12
+
