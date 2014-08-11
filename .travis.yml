@@ -15,5 +15,7 @@ before_install:
 script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("Meshes"))`); Pkg.pin("Meshes"); Pkg.resolve()'
   - cd ./test
-  - julia runtests.jl
-
+  - if [ $JULIAVERSION = "julianightlies" ]; then julia --code-coverage runtests.jl; fi
+  - if [ $JULIAVERSION = "juliareleases" ]; then julia runtests.jl; fi
+after_success:
+  - if [ $JULIAVERSION = "julianightlies" ]; then julia -e 'cd(Pkg.dir("Meshes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
