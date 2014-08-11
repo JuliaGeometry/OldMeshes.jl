@@ -1,5 +1,9 @@
 using Meshes
 
+# make sure we export to test/export
+export_path = Pkg.dir("Meshes")*"/test/export/"
+mkpath(export_path)
+
 # Produce a level set function that is a noisy version of the distance from
 # the origin (such that level sets are noisy spheres).
 #
@@ -27,7 +31,7 @@ toc()
 #
 # The mesh can be visualized, e.g., in MeshLab (http://meshlab.sourceforge.net/).
 #   
-exportToPly(msh,"noisy_sphere.ply")
+exportToPly(msh,export_path*"noisy_sphere.ply")
 
 # test contatenation
 msh3 = merge(msh,msh)
@@ -58,7 +62,7 @@ function testUnionNotInterection()
 
 	vol = volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
 	msh = isosurface(vol, 0.0)
-	exportToStl(msh, "wiki_csg.stl")
+	exportToStl(msh, export_path*"wiki_csg.stl")
 	toc()
 end
 testUnionNotInterection()
@@ -73,7 +77,7 @@ function testCylinders()
 
 	vol = volume(f, -3,-3,-3, 5,5,5, 2)
 	msh = isosurface(vol, 0.0)
-	exportToStl(msh, "cylinders_test.stl")
+	exportToStl(msh, export_path*"cylinders_test.stl")
 	toc()
 end
 testCylinders()
