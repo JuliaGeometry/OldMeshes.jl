@@ -1,16 +1,23 @@
 export import2dm,
        exportTo2dm
 
-# | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(file::String)
+    con = open(file, "r")
+    mesh = import2dm(con)
+    close(con)
+    return mesh
+end
+
+
+# | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
+function import2dm(con::IO)
     parseNode(w::Array{String}) = Vertex(float64(w[3]), float64(w[4]), float64(w[5]))
     parseTriangle(w::Array{String}) = Face(int64(w[3]), int64(w[4]), int64(w[5]))
     # Qudrilateral faces are split up into triangles
     function parseQuad(w::Array{String})
         w[7] = w[3]                     # making a circle
         Face[Face(int64(w[i]), int64(w[i+1]), int64(w[i+2])) for i = [3,5]]
-    end 
-    con = open(file, "r")
+    end
     nd =  Array(Vertex, 0)
     ele = Array(Face,0)
     for line = readlines(con)
@@ -26,7 +33,6 @@ function import2dm(file::String)
             continue
         end
     end
-    close(con)
     Mesh(nd,ele)
 end
 

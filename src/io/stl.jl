@@ -41,7 +41,14 @@ function exportToStl(msh::Mesh, fn::String)
 end
 
 
-function importBinarySTL(fn::String; topology=false)
+function importBinarySTL(file::String; topology=false)
+    fn = open(file,"r")
+    mesh = importBinarySTL(fn, topology=topology)
+    close(fn)
+    return mesh
+end
+
+function importBinarySTL(file::IO; topology=false, read_header=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
@@ -52,9 +59,9 @@ function importBinarySTL(fn::String; topology=false)
     vts = Vertex[]
     fcs = Face[]
 
-    file = open(fn,"r")
-
-    readbytes(file, 80) # throw out header
+    if !read_header
+        readbytes(file, 80) # throw out header
+    end
     read(file, Uint32) # throwout triangle count
 
     vert_count = 0
@@ -78,19 +85,22 @@ function importBinarySTL(fn::String; topology=false)
         push!(fcs, Face(vert_idx...))
     end
 
-    close(file)
-
     return Mesh(vts, fcs, topology)
 end
 
-function importAsciiSTL(fn::String; topology=false)
+function importAsciiSTL(file::String; topology=false)
+    fn = open(file,"r")
+    mesh = importAsciiSTL(fn, topology=topology)
+    close(fn)
+    return mesh
+end
+
+function importAsciiSTL(file::IO; topology=false)
     #ASCII STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
     vts = Vertex[]
     fcs = Face[]
-
-    file = open(fn,"r")
 
     vert_count = 0
     vert_idx = [0,0,0]
@@ -117,8 +127,6 @@ function importAsciiSTL(fn::String; topology=false)
             push!(fcs, Face(vert_idx...))
         end
     end
-
-    close(file)
 
     return Mesh(vts, fcs, topology)
 end

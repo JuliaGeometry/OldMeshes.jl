@@ -38,10 +38,16 @@ end
 
 
 function importPly(fn::String; topology=false)
+    str = open(fn,"r")
+    mesh = importPly(str, topology=topology)
+    close(str)
+    return mesh
+end
+
+
+function importPly(str::IO; topology=false)
     vts = Vertex[]
     fcs = Face[]
-
-    str = open(fn,"r")
 
     nV = 0
     nF = 0
@@ -74,7 +80,6 @@ function importPly(fn::String; topology=false)
             push!(fcs, Face(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
     end
-    close(str)
 
     if topology
         uvts = unique(vts)
