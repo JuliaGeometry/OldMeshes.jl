@@ -76,7 +76,7 @@ function importPly(str::IO; topology=false)
     for i = 1:nF
         txt = readline(str)   # 3 0 1 2
         fs = [int(i) for i in split(txt)]
-        for i = 3:length(fs)-1 #handle quads, etc...
+        for i = 3:fs[1] #triangulate
             push!(fcs, Face(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
     end
