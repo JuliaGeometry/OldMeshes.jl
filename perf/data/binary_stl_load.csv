@@ -1,0 +1,3 @@
+"Category","Benchmark","Iterations","TotalWall","AverageWall","MaxWall","MinWall","Timestamp","JuliaHash","CodeHash","OS","CPUCores"
+"Meshes","binary_stl_load",10,0.000250887,2.50887e-5,5.7545e-5,2.026e-5,"2014-08-12 17:24:11","daa3f82ab4454505803ee409a5f13d39e105bda6","556c93d51edb50b52037104deaa4719ec1f9f020","Linux",4
+"Meshes","binary_stl_load",10,0.00016922699999999998,1.69227e-5,4.0465e-5,1.3711e-5,"2014-08-12 20:46:30","daa3f82ab4454505803ee409a5f13d39e105bda6","556c93d51edb50b52037104deaa4719ec1f9f020","Linux",4
