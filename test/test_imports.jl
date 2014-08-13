@@ -30,3 +30,6 @@ ply1 = mesh(data_path*"cube.ply", topology=true) # quads
 @test length(ply1.vertices) == 8
 @test length(ply1.faces) == 12
 
+obj1 = mesh(data_path*"cube.obj") # quads
+@test length(obj1.vertices) == 8
+@test length(obj1.faces) == 12

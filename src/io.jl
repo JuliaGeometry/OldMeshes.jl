@@ -2,6 +2,7 @@ include("io/2dm.jl")
 include("io/off.jl")
 include("io/ply.jl")
 include("io/stl.jl")
+include("io/obj.jl")
 
 export mesh
 
@@ -22,6 +23,8 @@ function mesh(path::String; format=:autodetect, topology=false)
             fmt = :ply
         elseif endswith(path, ".2dm")
             fmt = :(2dm)
+        elseif endswith(path, ".obj")
+            fmt = :obj
         else
             error("Could not identify mesh format")
         end
@@ -34,6 +37,8 @@ function mesh(path::String; format=:autodetect, topology=false)
         msh = importPly(io, topology=topology)
     elseif fmt == :(2dm)
         msh = import2dm(io)
+    elseif fmt == :obj
+        msh = importOBJ(io)
     else
         error("Could not identify mesh format")
     end
