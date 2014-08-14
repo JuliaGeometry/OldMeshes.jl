@@ -6,7 +6,7 @@ include("io/obj.jl")
 
 export mesh
 
-function mesh(path::String; format=:autodetect, topology=false)
+function mesh(path::String; format=:autodetect, topology=false, vertextype=Float64, faceindextype=Int)
     io = open(path, "r")
     fmt = format
     msh = nothing
@@ -23,7 +23,7 @@ function mesh(path::String; format=:autodetect, topology=false)
             fmt = :ply
         elseif endswith(path, ".2dm")
             fmt = :(2dm)
-        elseif endswith(path, ".obj")
+        elseif endswith(path, ".obj") || endswith(path, ".OBJ")
             fmt = :obj
         else
             error("Could not identify mesh format")
@@ -38,7 +38,7 @@ function mesh(path::String; format=:autodetect, topology=false)
     elseif fmt == :(2dm)
         msh = import2dm(io)
     elseif fmt == :obj
-        msh = importOBJ(io)
+        msh = importOBJ(io, vertextype=vertextype, faceindextype=faceindextype, topology=topology)
     else
         error("Could not identify mesh format")
     end

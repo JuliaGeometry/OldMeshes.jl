@@ -8,25 +8,40 @@ function importOBJ(fn::String; topology=false)
 end
 
 
-function importOBJ(io::IO; topology=false)
-    vts = Vertex[]
-    fcs = Face[]
+function importOBJ(io::IO; topology=false, vertextype=Float64, faceindextype=Int)
+    vts = Vertex{vertextype}[]
+    fcs = Face{faceindextype}[]
+    vertexconvertfunc = vertextype == Float64 ? float64 : (vertextype == Float32 ? float32 : error("Vertex type: ", vertextype, " not supported"))
+    faceconvertfunc = faceindextype == Int ? int : (
+        faceindextype == Int32 ? int32 : (
+            faceindextype == Uint64 ? uint64 : faceindextype == Uint32 ? uint32 : error("Faceindex type: ", faceindextype, " not supported")))
 
     nV = 0
     nF = 0
-
     while !eof(io)
         txt = readline(io)
-        line = split(txt)
-        if line[1] == "v" #vertex
-            push!(vts, Vertex(float64(line[2]),
-                              float64(line[3]),
-                              float64(line[4])))
-        elseif line[1] == "f" #face
-            #get verts
-            verts = [int(split(line[i], "/")[1]) for i = 2:length(line)]
-            for i = 3:length(verts) #triangulate
-                push!(fcs, Face(verts[1], verts[i-1], verts[i]))
+        if !beginswith(txt, "#") && !isempty(txt) && !iscntrl(txt)
+            line = split(txt)
+            if line[1] == "v" #vertex
+                push!(vts, Vertex{vertextype}(vertexconvertfunc(line[2]),
+                                  vertexconvertfunc(line[3]),
+                                  vertexconvertfunc(line[4])))
+            elseif line[1] == "f" #face
+                #get verts
+
+                verts = faceindextype[faceconvertfunc(split(line[i], "/")[1]) for i = 2:length(line)]
+                for i = 3:length(verts) #triangulate
+                    push!(fcs, Face{faceindextype}(verts[1], verts[i-1], verts[i]))
+                end
+            #=    
+            elseif line[1] == "vt" #UV coordinates
+                push!(uvs, Vector3{vertextype}(vertexconvertfunc(line[2]),
+                                  vertexconvertfunc(line[3]),
+                                  vertexconvertfunc(line[4])))
+            elseif line[1] == "vn" #Normals
+                push!(nvs, Vector3{vertextype}(-vertexconvertfunc(line[2]),
+                                  -vertexconvertfunc(line[3]),
+                                  - vertexconvertfunc(line[4])))=#
             end
         end
     end

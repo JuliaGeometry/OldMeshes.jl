@@ -8,21 +8,22 @@ export Vertex,
        faces,
        merge
 
-typealias Vertex Vector3{Float64}
+typealias Vertex{T} Vector3{T}
 
-immutable Face
-    v1 :: Int64
-    v2 :: Int64
-    v3 :: Int64
+immutable Face{T <: Real}
+    v1 :: T
+    v2 :: T
+    v3 :: T
 end
 
 abstract AbstractMesh
 
-type Mesh <: AbstractMesh
-    vertices :: Vector{Vertex}
-    faces :: Vector{Face}
+type Mesh{VT <: Real, FT <: Integer} <: AbstractMesh
+    vertices :: Vector{Vertex{VT}}
+    faces :: Vector{Face{FT}}
     has_topology :: Bool
 end
+Mesh{VT <: Real, FT <: Integer}(vertices::Vector{Vertex{VT}}, faces::Vector{Face{FT}}, has_topology::Bool) = Mesh{VT, FT}(vertices, faces, has_topology)
 
 Mesh(v,f) = Mesh(v,f, true)
 
