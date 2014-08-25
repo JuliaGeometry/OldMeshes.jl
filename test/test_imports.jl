@@ -33,3 +33,15 @@ ply1 = mesh(data_path*"cube.ply", topology=true) # quads
 obj1 = mesh(data_path*"cube.obj") # quads
 @test length(obj1.vertices) == 8
 @test length(obj1.faces) == 12
+
+amf1 = mesh(data_path*"pyramid.amf")
+@test length(amf1[1].vertices) == 5
+@test length(amf1[1].faces) == 4
+@test length(amf1[2].vertices) == 5
+@test length(amf1[2].faces) == 4
+
+amf1 = mesh(data_path*"pyramid_zip.amf")
+@test length(amf1[1].vertices) == 5
+@test length(amf1[1].faces) == 4
+@test length(amf1[2].vertices) == 5
+@test length(amf1[2].faces) == 4

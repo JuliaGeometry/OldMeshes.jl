@@ -1,8 +1,11 @@
 include("io/2dm.jl")
+include("io/amf.jl")
+include("io/obj.jl")
 include("io/off.jl")
 include("io/ply.jl")
 include("io/stl.jl")
-include("io/obj.jl")
+
+using ZipFile
 
 export mesh
 
@@ -25,6 +28,17 @@ function mesh(path::String; format=:autodetect, topology=false)
             fmt = :(2dm)
         elseif endswith(path, ".obj")
             fmt = :obj
+        elseif endswith(path, ".amf")
+            # check if zipped
+            header = readbytes(io,4)
+            close(io)
+            if header == [0x50,0x4b,0x03,0x04]
+                contents = ZipFile.Reader(path)
+                io = contents.files[1] # TODO: analyize contents
+            else # uncompressed
+                io = open(path, "r")
+            end
+            fmt = :amf
         else
             error("Could not identify mesh format")
         end
@@ -39,6 +53,8 @@ function mesh(path::String; format=:autodetect, topology=false)
         msh = import2dm(io)
     elseif fmt == :obj
         msh = importOBJ(io)
+    elseif fmt == :amf
+        msh = importAMF(io)
     else
         error("Could not identify mesh format")
     end
