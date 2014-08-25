@@ -29,15 +29,6 @@ function mesh(path::String; format=:autodetect, topology=false)
         elseif endswith(path, ".obj")
             fmt = :obj
         elseif endswith(path, ".amf")
-            # check if zipped
-            header = readbytes(io,4)
-            close(io)
-            if header == [0x50,0x4b,0x03,0x04]
-                contents = ZipFile.Reader(path)
-                io = contents.files[1] # TODO: analyize contents
-            else # uncompressed
-                io = open(path, "r")
-            end
             fmt = :amf
         else
             error("Could not identify mesh format")
@@ -54,6 +45,15 @@ function mesh(path::String; format=:autodetect, topology=false)
     elseif fmt == :obj
         msh = importOBJ(io)
     elseif fmt == :amf
+        # check if zipped
+        header = readbytes(io,4)
+        close(io)
+        if header == [0x50,0x4b,0x03,0x04]
+            contents = ZipFile.Reader(path)
+            io = contents.files[1] # TODO: analyize contents
+        else # uncompressed
+            io = open(path, "r")
+        end
         msh = importAMF(io)
     else
         error("Could not identify mesh format")
