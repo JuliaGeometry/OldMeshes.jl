@@ -15,12 +15,19 @@ Supported file formats:
 * [Aquaveo-SMS 2DM](http://www.xmswiki.com/xms/SMS:2D_Mesh_Files_*.2dm)
 * [ASCII PLY](https://en.wikipedia.org/wiki/PLY)
 * [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
+* [AMF](http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format)
 
 Meshes can be imported with the following function.
 
 ```mesh(path::String; format=:autodetect, topology=false)```
 
-By default the function autodetects the file format for you. You can specify a format manually by setting `format` to one of `:ply`, `:(2dm)`, `:obj`, `:binarystl`, or `:asciistl`.
+By default the function autodetects the file format for you. You can specify a format manually by setting `format` to one of:
+* `:ply`
+* `:(2dm)`
+* `:obj`
+* `:binarystl`
+* `:asciistl`
+* `:amf`
 
 By default we do not check topology for repeat vertices since it can be computationally expensive. If `topology` is set to `true`, repeat vertices are eliminated so the `Mesh` is a proper [face-vertex](https://en.wikipedia.org/wiki/Polygon_mesh#Face-vertex_meshes) polygon mesh.
 
