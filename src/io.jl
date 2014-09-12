@@ -30,6 +30,8 @@ function mesh(path::String; format=:autodetect, topology=false)
             fmt = :obj
         elseif endswith(path, ".amf")
             fmt = :amf
+        elseif endswith(path, ".off")
+            fmt = :off
         else
             error("Could not identify mesh format")
         end
@@ -55,6 +57,8 @@ function mesh(path::String; format=:autodetect, topology=false)
             io = open(path, "r")
         end
         msh = importAMF(io)
+    elseif fmt == :off
+        msh = importOFF(io)
     else
         error("Could not identify mesh format")
     end

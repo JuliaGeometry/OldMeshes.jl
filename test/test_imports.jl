@@ -45,3 +45,7 @@ amf1 = mesh(data_path*"pyramid_zip.amf")
 @test length(amf1[1].faces) == 4
 @test length(amf1[2].vertices) == 5
 @test length(amf1[2].faces) == 4
+
+off1 = mesh(data_path*"cube.off") # quads
+@test length(off1.vertices) == 8
+@test length(off1.faces) == 12
