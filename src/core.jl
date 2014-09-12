@@ -16,6 +16,9 @@ immutable Face
     v3 :: Int64
 end
 
+Face(v::AbstractArray) = Face(v[1], v[2], v[3])
+
+
 abstract AbstractMesh
 
 type Mesh <: AbstractMesh
