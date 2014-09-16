@@ -1,5 +1,3 @@
-using ImmutableArrays
-
 export Vertex,
        Face,
        AbstractMesh,

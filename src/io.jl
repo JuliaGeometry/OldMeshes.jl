@@ -6,8 +6,6 @@ include("io/ply.jl")
 include("io/stl.jl")
 include("io/threejs.jl")
 
-using ZipFile
-
 export mesh
 
 function mesh(path::String; format=:autodetect, topology=false)
