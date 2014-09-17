@@ -1,15 +1,5 @@
-type Polygon
-    bounds::Bounds2
-    segments::Array{LineSegment}
-end
-
-type MeshSlice
-    bounds::Bounds2
-    polygons::Array{Polygon}
-    layer::Float64
-end
-
-function MeshSlice(mesh::PolygonMesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
+# returns an array of SegmentedPolygons
+function slice(mesh::PolygonMesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
     slices = [LineSegment[] for i = 1:length(heights)]
     bounds = [Bounds2() for i = 1:length(heights)]
 
@@ -29,10 +19,10 @@ function MeshSlice(mesh::PolygonMesh, heights::Array{Float64}; eps=0.00001, auto
         end
     end
 
-    polys = MeshSlice[]
+    polys = SegmentedPolygon[]
 
     for i = 1:length(heights)
-        push!(polys, MeshSlice(bounds[i], Polygon(slices[i], eps=eps, autoeps=autoeps), heights[i]))
+        push!(polys, SegmentedPolygon(slices[i], eps=eps, autoeps=autoeps))
     end
 
     return polys
