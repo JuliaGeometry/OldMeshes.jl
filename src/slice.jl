@@ -1,28 +1,33 @@
-# returns an array of SegmentedPolygons
-function slice(mesh::PolygonMesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
-    slices = [LineSegment[] for i = 1:length(heights)]
-    bounds = [Bounds2() for i = 1:length(heights)]
+export slice
 
+# returns an array of SegmentedPolygons
+function slice(mesh::Mesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
+    slices = [LineSegment[] for i = 1:length(heights)]
+
+    n = length(heights)
     for face in mesh.faces
-        i = 1
-        for height in heights
-            if height > face.zmax
+        v1 = mesh.vertices[face.v1]
+        v2 = mesh.vertices[face.v2]
+        v3 = mesh.vertices[face.v3]
+        zmax = max(v1[3], v2[3], v3[3])
+        zmin = min(v1[3], v2[3], v3[3])
+        for i = 1:n
+            height = heights[i]
+            if height > zmax
                 break
-            elseif face.zmin <= height
-                seg = LineSegment(face, height)
+            elseif zmin <= height
+                seg = LineSegment(v1,v2,v3, height)
                 if seg != nothing
                     push!(slices[i], seg)
-                    update!(bounds[i], seg)
                 end
             end
-            i = i + 1
         end
     end
 
     polys = SegmentedPolygon[]
 
     for i = 1:length(heights)
-        push!(polys, SegmentedPolygon(slices[i], eps=eps, autoeps=autoeps))
+        append!(polys, SegmentedPolygon(slices[i], eps=eps, autoeps=autoeps))
     end
 
     return polys
