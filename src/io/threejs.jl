@@ -4,8 +4,14 @@ import JSON
 export exportToThreejs,
 		importThreejs
 
+import Base.writemime
 
-function exportToThreejs( msh::Mesh, fn::String )
+
+function exportToThreejs(msh::Mesh, fn::String)
+	exportToThreejs(msh, open(fn, "w"))
+end
+
+function exportToThreejs( msh::Mesh, str::IO)
 	vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -26,10 +32,15 @@ function exportToThreejs( msh::Mesh, fn::String )
 	json["metadata"] = Dict()
 	json["metadata"]["formatVersion"] = 3
 
-	str = open(fn,"w")
 	write(str, JSON.json( json ) )
 	close(str)
 end
+
+
+function writemime(io::IO, ::MIME"model/threejs", msh::Mesh)
+	exportToSTL(msh, io)
+end
+
 
 
 function importThreejs( fn::String, topology=true )
@@ -63,7 +74,7 @@ function importThreejs( fn::String, topology=true )
     i = 1;
     zLength = length( json["faces"] );
 
-    while i <= zLength 
+    while i <= zLength
 
         facetype = json["faces"][i]
        	i += 1
