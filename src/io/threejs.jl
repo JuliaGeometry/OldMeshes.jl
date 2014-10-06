@@ -11,7 +11,7 @@ function exportToThreejs(msh::Mesh, fn::String)
 	exportToThreejs(msh, open(fn, "w"))
 end
 
-function exportToThreejs( msh::Mesh, str::IO)
+function exportToThreejs( msh::Mesh, str::IO, closeAfterwards::Bool)
 	vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -33,9 +33,12 @@ function exportToThreejs( msh::Mesh, str::IO)
 	json["metadata"]["formatVersion"] = 3
 
 	write(str, JSON.json( json ) )
-	close(str)
+	if closeAfterwards
+		close(str)
+	end
 end
 
+exportToThreejs(msh::Mesh, str::IO) = exportToThreejs(msh, str, true)
 
 function writemime(io::IO, ::MIME"model/threejs", msh::Mesh)
 	exportToSTL(msh, io)
