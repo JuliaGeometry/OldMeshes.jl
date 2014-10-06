@@ -4,6 +4,7 @@ include("io/obj.jl")
 include("io/off.jl")
 include("io/ply.jl")
 include("io/stl.jl")
+include("io/threejs.jl")
 
 using ZipFile
 
@@ -32,6 +33,8 @@ function mesh(path::String; format=:autodetect, topology=false)
             fmt = :amf
         elseif endswith(path, ".off")
             fmt = :off
+        elseif endswith(path, ".js")
+            fmt = :threejs
         else
             error("Could not identify mesh format")
         end
@@ -59,6 +62,8 @@ function mesh(path::String; format=:autodetect, topology=false)
         msh = importAMF(io)
     elseif fmt == :off
         msh = importOFF(io)
+    elseif fmt == :threejs
+        msh = importThreejs(io)
     else
         error("Could not identify mesh format")
     end
