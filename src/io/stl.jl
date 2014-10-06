@@ -2,13 +2,17 @@ export exportToStl,
        importBinarySTL,
        importAsciiSTL
 
+import Base.writemime
+
 function exportToStl(msh::Mesh, fn::String)
+  exportToStl(msh, open(fn, "w"))
+end
+
+function exportToStl(msh::Mesh, str::IO)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
     nF = size(fcs,1)
-
-    str = open(fn,"w")
 
     # write the header
     write(str,"solid vcg\n")
@@ -38,6 +42,10 @@ function exportToStl(msh::Mesh, fn::String)
 
     write(str,"endsolid vcg\n")
     close(str)
+end
+
+function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
+  exportToSTL(msh, io)
 end
 
 
