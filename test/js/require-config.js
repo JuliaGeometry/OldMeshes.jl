@@ -5,8 +5,7 @@ require.config({
     json: '//cdnjs.cloudflare.com/ajax/libs/requirejs-plugins/1.0.3/json',
     threejs: '//cdnjs.cloudflare.com/ajax/libs/three.js/r68/three',
     text: '//cdnjs.cloudflare.com/ajax/libs/require-text/2.0.12/text',
-    data: '../data',
-    trackball: 'http://threejs.org/examples/js/controls/TrackballControls'
+    trackball: 'https://baconscript.github.io/Meshes.jl/files/js/TrackballControls'
   },
   shim: {
     threejs: {
