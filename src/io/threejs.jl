@@ -44,7 +44,24 @@ function writemime(io::IO, ::MIME"model/threejs", msh::Mesh)
 	exportToSTL(msh, io)
 end
 
-
+function writemime(io::IO, ::MIME"text/html", msh::Mesh)
+	  divID = string("mesh-display-",rand(Int64))
+    write(io, """
+    <div id="$divID"></div>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
+    <script src="/files/js/require-config.js"></script>
+  <div id="mesh-display"></div>
+  <script>
+  require([
+    '/files/js/display-mesh.js'], function(displayMesh){ displayMesh(
+    """)
+    exportToThreejs(msh, io, false)
+    write(io, """,
+    '$divID');
+    });
+    </script>
+    """)
+end
 
 function importThreejs( fn::String, topology=true )
 
