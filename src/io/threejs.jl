@@ -49,11 +49,11 @@ function writemime(io::IO, ::MIME"text/html", msh::Mesh)
     write(io, """
     <div id="$divID"></div>
   <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
-    <script src="/files/js/require-config.js"></script>
+    <script src="https://baconscript.github.io/Meshes.jl/files/js/require-config.js"></script>
   <div id="mesh-display"></div>
   <script>
   require([
-    '/files/js/display-mesh.js'], function(displayMesh){ displayMesh(
+    'https://baconscript.github.io/Meshes.jl/files/js/display-mesh.js'], function(displayMesh){ displayMesh(
     """)
     exportToThreejs(msh, io, false)
     write(io, """,
