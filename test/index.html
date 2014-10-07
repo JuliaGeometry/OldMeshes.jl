@@ -4,5 +4,13 @@
 </head>
 <body>
   <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.min.js"></script>
-  <script src="js/display-mesh.js">
-  </script>
+  <script src="js/require-config.js"></script>
+  <div id="mesh-display"></div>
+  <script>
+  require([
+    'display-mesh',
+    'json!data/cube.3js.json'
+  ], function(displayMesh, cubeJSON){
+    displayMesh(cubeJSON, 'mesh-display');
+  });
+</script>
