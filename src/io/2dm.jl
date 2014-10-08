@@ -1,6 +1,8 @@
 export import2dm,
        exportTo2dm
 
+import Base.writemime
+
 function import2dm(file::String)
     con = open(file, "r")
     mesh = import2dm(con)
@@ -53,6 +55,10 @@ function exportTo2dm(con::IO,m::Mesh)
         write(con, renderVertex(i, m.vertices[i]))
     end
     nothing
+end
+
+function writemime(io::IO, ::MIME"model/2dm", mesh::Mesh)
+    exportTo2dm(io, mesh)
 end
 
 # | Write a @Mesh@ to file in SMS-.2dm-file-format
