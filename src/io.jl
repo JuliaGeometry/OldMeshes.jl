@@ -13,7 +13,7 @@ export mesh
 function mesh(path::String; format=:autodetect, topology=false)
     io = open(path, "r")
     fmt = format
-    msh = nothing
+    local msh
     if fmt == :autodetect
         if endswith(path, ".stl")
             header = ascii(readbytes(io, 5))
