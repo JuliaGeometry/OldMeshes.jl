@@ -30,7 +30,14 @@ toc()
 # Export the mesh to a ply.
 #
 # The mesh can be visualized, e.g., in MeshLab (http://meshlab.sourceforge.net/).
-exportToPly(msh,export_path*"noisy_sphere.ply")
+exportToAsciiPly(msh,export_path*"noisy_sphere.ply")
+
+# Export the mesh to ascii format ply.
+exportToAsciiPly(msh,export_path*"noisy_sphere.ascii.ply")
+# test re-importing the mesh (only ascii format) works as well.
+importedMsh = mesh(export_path*"noisy_sphere.ascii.ply")
+@test length(importedMsh.vertices) == length(msh.vertices)
+@test length(importedMsh.faces) == length(msh.faces)
 
 # test contatenation
 msh3 = merge(msh,msh)

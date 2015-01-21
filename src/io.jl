@@ -24,7 +24,13 @@ function mesh(path::String; format=:autodetect, topology=false)
                 fmt = :binarystl
             end
         elseif endswith(path, ".ply")
-            fmt = :ply
+            header1 = ascii(readline(io))  # ply
+            header2 = ascii(readline(io))  # format ascii 1.0
+            if contains(lowercase(header2), "format ascii")
+                fmt = :asciiply
+            else
+                fmt = :binaryply
+            end
         elseif endswith(path, ".2dm")
             fmt = :(2dm)
         elseif endswith(path, ".obj")
@@ -43,8 +49,10 @@ function mesh(path::String; format=:autodetect, topology=false)
         msh = importBinarySTL(io, topology=topology, read_header=true)
     elseif fmt == :asciistl
         msh = importAsciiSTL(io, topology=topology)
-    elseif fmt == :ply
-        msh = importPly(io, topology=topology)
+    elseif fmt == :asciiply
+        msh = importAsciiPly(io, topology=topology)
+    elseif fmt == :binaryply
+        error("Reading binary .ply files not yet implemented")
     elseif fmt == :(2dm)
         msh = import2dm(io)
     elseif fmt == :obj

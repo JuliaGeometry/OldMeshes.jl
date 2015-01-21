@@ -7,7 +7,8 @@ export volume,
        cylinderX,
        cylinderY,
        cylinderZ,
-       box
+       box,
+       coneZ
 
 function volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
     x_rng = x_max - x_min
@@ -66,5 +67,12 @@ function box(x,y,z, x_min,y_min,z_min,x_max,y_max,z_max)
     vy = max(y_min-y, y-y_max)
     vz = max(z_min-z, z-z_max)
     max(vx, vy, vz)
+end
+
+
+function coneZ(x,y,z, cx,cy,cz,cr_per_z,czmin,czmax)
+    vr = hypot(x-cx,y-cy) - (cr_per_z*(z-cz))
+    vz = max(czmin-z, z-czmax)
+    max(vr,vz)
 end
 
