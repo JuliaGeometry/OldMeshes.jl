@@ -41,7 +41,7 @@ Support export formats:
 * [Aquaveo-SMS 2DM](http://www.xmswiki.com/xms/SMS:2D_Mesh_Files_*.2dm)
 * [Binary and ASCII PLY](https://en.wikipedia.org/wiki/PLY)
 * [OFF](https://en.wikipedia.org/wiki/OFF_%28file_format%29)
-Ä [threejs](https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3)
+* [threejs](https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3)
 
 ## Coming soon, hopefully...
 
