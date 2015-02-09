@@ -53,7 +53,7 @@ function importOFF(io::IO; topology=false)
 
     while !eof(io)
         txt = readline(io)
-        if beginswith(txt, "#") #comment
+        if startswith(txt, "#") #comment
             continue
         elseif found_counts && read_verts < nV # read verts
             vert = map(float64, split(txt))

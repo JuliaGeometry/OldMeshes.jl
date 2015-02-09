@@ -85,12 +85,12 @@ function importAsciiPly(io::IO; topology=false)
 
     # read the header
     line = readline(io)
-    while !beginswith(line, "end_header")
-        if beginswith(line, "element vertex")
+    while !startswith(line, "end_header")
+        if startswith(line, "element vertex")
             nV = int(split(line)[3])
-        elseif beginswith(line, "element face")
+        elseif startswith(line, "element face")
             nF = int(split(line)[3])
-        elseif beginswith(line, "property")
+        elseif startswith(line, "property")
             push!(properties, line)
         end
         line = readline(io)
