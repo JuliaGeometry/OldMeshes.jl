@@ -14,8 +14,9 @@ function mesh(path::String; format=:autodetect, topology=false)
     io = open(path, "r")
     fmt = format
     local msh
+    lcase_path = lowercase(path)
     if fmt == :autodetect
-        if endswith(path, ".stl")
+        if endswith(lcase_path, ".stl")
             header = ascii(readbytes(io, 5))
             if lowercase(header) == "solid"
                 fmt = :asciistl
@@ -23,7 +24,7 @@ function mesh(path::String; format=:autodetect, topology=false)
                 readbytes(io, 75) # throw out header
                 fmt = :binarystl
             end
-        elseif endswith(path, ".ply")
+        elseif endswith(lcase_path, ".ply")
             header1 = ascii(readline(io))  # ply
             header2 = ascii(readline(io))  # format ascii 1.0
             if contains(lowercase(header2), "format ascii")
@@ -31,15 +32,15 @@ function mesh(path::String; format=:autodetect, topology=false)
             else
                 fmt = :binaryply
             end
-        elseif endswith(path, ".2dm")
+        elseif endswith(lcase_path, ".2dm")
             fmt = :(2dm)
-        elseif endswith(path, ".obj")
+        elseif endswith(lcase_path, ".obj")
             fmt = :obj
-        elseif endswith(path, ".amf")
+        elseif endswith(lcase_path, ".amf")
             fmt = :amf
-        elseif endswith(path, ".off")
+        elseif endswith(lcase_path, ".off")
             fmt = :off
-        elseif endswith(path, ".js")
+        elseif endswith(lcase_path, ".js")
             fmt = :threejs
         else
             error("Could not identify mesh format")
