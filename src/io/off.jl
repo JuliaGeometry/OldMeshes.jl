@@ -42,7 +42,7 @@ end
 
 function importOFF(io::IO; topology=false)
 
-    vts = nothing
+    local vts
     fcs = Face[] # faces might be triangulated, so we can't assume count
 
     nV = 0
