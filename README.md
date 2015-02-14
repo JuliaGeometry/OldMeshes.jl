@@ -1,7 +1,7 @@
 # Meshes.jl
 
-[![Build Status](https://travis-ci.org/twadleigh/Meshes.jl.svg?branch=master)](https://travis-ci.org/twadleigh/Meshes.jl)
-[![Coverage Status](https://img.shields.io/coveralls/twadleigh/Meshes.jl.svg)](https://coveralls.io/r/twadleigh/Meshes.jl)
+[![Build Status](https://travis-ci.org/JuliaGeometry/Meshes.jl.svg?branch=master)](https://travis-ci.org/JuliaGeometry/Meshes.jl)
+[![Coverage Status](https://img.shields.io/coveralls/JuliaGeometry/Meshes.jl.svg)](https://coveralls.io/r/JuliaGeometry/Meshes.jl)
 
 Generation and manipulation of triangular [polygon meshes](https://en.wikipedia.org/wiki/Polygon_mesh).
 
