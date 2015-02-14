@@ -1,10 +1,8 @@
-export slice
 
-# returns an array of SegmentedPolygons
-function slice(mesh::Mesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
+function Base.slice(mesh::Mesh, heights::Array{Float64})
 
     n = length(heights)
-    segments = [LineSegment[] for i = 1:n]
+    segments = [(Vector2{Float64}, Vector2{Float64})[] for i = 1:n]
 
     for face in mesh.faces
         v1 = mesh.vertices[face.v1]
@@ -17,19 +15,44 @@ function slice(mesh::Mesh, heights::Array{Float64}; eps=0.00001, autoeps=true)
             if height > zmax
                 break
             elseif zmin <= height
-                seg = LineSegment(v1,v2,v3, height)
-                if seg != nothing
-                    push!(segments[i], seg)
+                if v1[3] < height && v2[3] >= height && v3[3] >= height
+                    p1 = v1
+                    p2 = v3
+                    p3 = v2
+                elseif v1[3] > height && v2[3] < height && v3[3] < height
+                    p1 = v1
+                    p2 = v2
+                    p3 = v3
+                elseif v2[3] < height && v1[3] >= height && v3[3] >= height
+                    p1 = v2
+                    p2 = v1
+                    p3 = v3
+                elseif v2[3] > height && v1[3] < height && v3[3] < height
+                    p1 = v2
+                    p2 = v3
+                    p3 = v1
+                elseif v3[3] < height && v2[3] >= height && v1[3] >= height
+                    p1 = v3
+                    p2 = v2
+                    p3 = v1
+                elseif v3[3] > height && v2[3] < height && v1[3] < height
+                    p1 = v3
+                    p2 = v1
+                    p3 = v2
+                else
+                    continue
                 end
+
+                start = Vector2{Float64}(p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3]),
+                p1[2] + (p2[2] - p1[2]) * (height - p1[3]) / (p2[3] - p1[3]))
+                finish = Vector2{Float64}(p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3]),
+                p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3]))
+
+                push!(segments[i], (start, finish))
             end
         end
     end
 
-    polys = [SegmentedPolygon[] for i = 1:n]
-
-    for i = 1:n
-        append!(polys[i], SegmentedPolygon(segments[i], eps=eps, autoeps=autoeps))
-    end
-
-    return polys
+    return segments
 end
+
