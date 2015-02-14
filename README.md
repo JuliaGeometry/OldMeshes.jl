@@ -43,9 +43,21 @@ Support export formats:
 * [OFF](https://en.wikipedia.org/wiki/OFF_%28file_format%29)
 * [threejs](https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3)
 
-## Coming soon, hopefully...
+## Roadmap
+
+### [0.1.0](https://github.com/JuliaGeometry/Meshes.jl/milestones/v0.1.0)
+
+1. [Slicing](https://github.com/JuliaGeometry/Meshes.jl/pull/34) (3D -> 2D plane)
+
+### [0.2.0](https://github.com/JuliaGeometry/Meshes.jl/milestones/v0.2.0)
+
+1. Merge improvements in [Meshes2](https://github.com/JuliaGeometry/Meshes2.jl)
+2. First release requiring Julia 0.4
+
+### Future
 
 1. Basic mesh simplification.
+2. [Mesh repair.](https://github.com/JuliaGeometry/Meshes.jl/issues/33)
 
 ## License
 This package is available under the MIT "Expat" License. See [LICENSE.md](./LICENSE.md).
