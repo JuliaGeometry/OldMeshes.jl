@@ -1,20 +1,8 @@
-language: cpp
-compiler:
-  - clang
+language: julia
+julia:
+  - release
+  - nightly
 notifications:
   email: false
-env:
-  matrix:
-    - JULIAVERSION="juliareleases"
-    - JULIAVERSION="julianightlies"
-before_install:
-  - sudo add-apt-repository ppa:staticfloat/julia-deps -y
-  - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
-  - sudo apt-get update -qq -y
-  - sudo apt-get install libpcre3-dev julia -y
-script:
-  - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("Meshes"))`); Pkg.pin("Meshes"); Pkg.resolve()'
-  - cd ./test
-  - julia --code-coverage runtests.jl
 after_success:
   - julia -e 'cd(Pkg.dir("Meshes")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
