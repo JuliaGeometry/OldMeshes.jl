@@ -1,7 +1,5 @@
 # http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format
 
-using LightXML
-
 function importAMF(io::IO; topology=false)
     str = readall(io)
     xml = parse_string(str)
