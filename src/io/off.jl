@@ -64,9 +64,9 @@ function importOFF(io::IO; topology=false)
             continue
         elseif found_counts # read faces
             face = map(int64, split(txt))
-            if length(face) == 4
-                for i = 3:face[1] #triangulate
-                    push!(fcs, Face(face[1], face[i-1], face[i]))
+            if length(face) >= 4
+                for i = 4:length(face) #triangulate
+                    push!(fcs, Face(face[2]+1, face[i-1]+1, face[i]+1))
                 end
             end
             continue
