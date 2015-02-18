@@ -1,5 +1,5 @@
 export import2dm,
-       exportTo2dm
+       export2dm
 
 import Base.writemime
 
@@ -40,7 +40,7 @@ end
 
 
 # | Write @Mesh@ to an IOStream
-function exportTo2dm(con::IO,m::Mesh)
+function export2dm(con::IO,m::Mesh)
     function renderVertex(i::Int,v::Vertex)
         "ND $i $(v.e1) $(v.e2) $(v.e3)\n"
     end
@@ -58,13 +58,13 @@ function exportTo2dm(con::IO,m::Mesh)
 end
 
 function writemime(io::IO, ::MIME"model/2dm", mesh::Mesh)
-    exportTo2dm(io, mesh)
+    export2dm(io, mesh)
 end
 
 # | Write a @Mesh@ to file in SMS-.2dm-file-format
 function exportTo2dm(f::String,m::Mesh)
     con = open(f, "w")
-    exportTo2dm(con, m)
+    export2dm(con, m)
     close(con)
     nothing
 end

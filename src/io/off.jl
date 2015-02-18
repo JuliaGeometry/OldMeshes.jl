@@ -1,6 +1,6 @@
-export exportToOFF
+export exportOFF
 
-function exportToOFF(msh::Mesh, fn::String, rgba)
+function exportOFF(msh::Mesh, fn::String, rgba)
     # writes an OFF geometry file, with colors
     #  see http://people.sc.fsu.edu/~jburkardt/data/off/off.html
     #  for format description

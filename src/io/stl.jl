@@ -1,14 +1,14 @@
-export exportToStl,
+export exportStl,
        importBinarySTL,
        importAsciiSTL
 
 import Base.writemime
 
-function exportToStl(msh::Mesh, fn::String)
-  exportToStl(msh, open(fn, "w"))
+function exportStl(msh::Mesh, fn::String)
+  exportStl(msh, open(fn, "w"))
 end
 
-function exportToStl(msh::Mesh, str::IO, closeAfterwards::Bool)
+function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -42,10 +42,10 @@ function exportToStl(msh::Mesh, str::IO, closeAfterwards::Bool)
     end
 end
 
-exportToStl(msh::Mesh, str::IO) = exportToStl(msh, str, true)
+exportStl(msh::Mesh, str::IO) = exportStl(msh, str, true)
 
 function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
-  exportToSTL(msh, io)
+  exportSTL(msh, io)
 end
 
 

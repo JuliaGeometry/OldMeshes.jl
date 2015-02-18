@@ -30,10 +30,10 @@ toc()
 # Export the mesh to a ply.
 #
 # The mesh can be visualized, e.g., in MeshLab (http://meshlab.sourceforge.net/).
-exportToAsciiPly(msh,export_path*"noisy_sphere.ply")
+exportAsciiPly(msh,export_path*"noisy_sphere.ply")
 
 # Export the mesh to ascii format ply.
-exportToAsciiPly(msh,export_path*"noisy_sphere.ascii.ply")
+exportAsciiPly(msh,export_path*"noisy_sphere.ascii.ply")
 # test re-importing the mesh (only ascii format) works as well.
 importedMsh = mesh(export_path*"noisy_sphere.ascii.ply")
 @test length(importedMsh.vertices) == length(msh.vertices)
@@ -67,7 +67,7 @@ function testUnionNotInterection()
 
     vol = volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
     msh = isosurface(vol, 0.0)
-    exportToStl(msh, export_path*"wiki_csg.stl")
+    exportStl(msh, export_path*"wiki_csg.stl")
     toc()
 end
 testUnionNotInterection()
@@ -82,7 +82,7 @@ function testCylinders()
 
     vol = volume(f, -3,-3,-3, 5,5,5, 2)
     msh = isosurface(vol, 0.0)
-    exportToStl(msh, export_path*"cylinders_test.stl")
+    exportStl(msh, export_path*"cylinders_test.stl")
     toc()
 end
 testCylinders()

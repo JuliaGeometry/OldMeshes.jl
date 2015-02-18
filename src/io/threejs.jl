@@ -1,15 +1,15 @@
 # https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3
 
 import JSON
-export exportToThreejs, importThreejs
+export exportThreejs, importThreejs
 
 import Base.writemime
 
-function exportToThreejs(msh::Mesh, fn::String)
-         exportToThreejs(msh, open(fn, "w"))
+function exportThreejs(msh::Mesh, fn::String)
+         exportThreejs(msh, open(fn, "w"))
 end
 
-function exportToThreejs(msh::Mesh, str::IO, closeAfterwards::Bool)
+function exportThreejs(msh::Mesh, str::IO, closeAfterwards::Bool)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -36,10 +36,10 @@ function exportToThreejs(msh::Mesh, str::IO, closeAfterwards::Bool)
     end
 end
 
-exportToThreejs(msh::Mesh, str::IO) = exportToThreejs(msh, str, true)
+exportThreejs(msh::Mesh, str::IO) = exportThreejs(msh, str, true)
 
 function writemime(io::IO, ::MIME"model/threejs", msh::Mesh)
-    exportToSTL(msh, io)
+    exportSTL(msh, io)
 end
 
 function writemime(io::IO, ::MIME"text/html", msh::Mesh)
@@ -53,7 +53,7 @@ function writemime(io::IO, ::MIME"text/html", msh::Mesh)
         require([
         'https://baconscript.github.io/Meshes.jl/files/js/display-mesh.js'], function(displayMesh){ displayMesh(
     """)
-    exportToThreejs(msh, io, false)
+    exportThreejs(msh, io, false)
     write(io, """,
         '$divID');
         });

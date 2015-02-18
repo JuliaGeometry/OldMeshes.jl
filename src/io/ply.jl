@@ -1,8 +1,8 @@
-export exportToBinaryPly,
-       exportToAsciiPly,
+export exportBinaryPly,
+       exportAsciiPly,
        importAsciiPly
 
-function exportToBinaryPly(msh::Mesh, fn::String)
+function exportBinaryPly(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -37,7 +37,7 @@ function exportToBinaryPly(msh::Mesh, fn::String)
 end
 
 
-function exportToAsciiPly(msh::Mesh, fn::String)
+function exportAsciiPly(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
