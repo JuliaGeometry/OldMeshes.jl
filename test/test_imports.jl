@@ -49,3 +49,8 @@ amf1 = mesh(data_path*"pyramid_zip.amf")
 off1 = mesh(data_path*"cube.off") # quads
 @test length(off1.vertices) == 8
 @test length(off1.faces) == 12
+
+# Test isempty
+@test isempty(Mesh())
+@test !isempty(off1)
+

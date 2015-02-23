@@ -31,6 +31,8 @@ Mesh() = Mesh(Vertex[], Face[], true)
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
 
+Base.isempty(m::Mesh) = isempty(m.vertices) && isempty(m.faces)
+
 # concatenates two meshes
 function merge(m1::AbstractMesh, m2::AbstractMesh)
     v1 = vertices(m1)
