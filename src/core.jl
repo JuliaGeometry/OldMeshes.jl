@@ -26,6 +26,7 @@ type Mesh <: AbstractMesh
 end
 
 Mesh(v,f) = Mesh(v,f, true)
+Mesh() = Mesh(Vertex[], Face[], true)
 
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
