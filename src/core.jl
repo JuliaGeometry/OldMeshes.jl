@@ -8,10 +8,10 @@ export Vertex,
 
 typealias Vertex Vector3{Float64}
 
-immutable Face
-    v1 :: Int64
-    v2 :: Int64
-    v3 :: Int64
+immutable Face{T}
+    v1::T
+    v2::T
+    v3::T
 end
 
 Face(v::AbstractArray) = Face(v[1], v[2], v[3])
@@ -19,9 +19,9 @@ Face(v::AbstractArray) = Face(v[1], v[2], v[3])
 
 abstract AbstractMesh
 
-type Mesh <: AbstractMesh
+type Mesh{F} <: AbstractMesh
     vertices :: Vector{Vertex}
-    faces :: Vector{Face}
+    faces :: Vector{F}
     has_topology :: Bool
 end
 
