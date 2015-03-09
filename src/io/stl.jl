@@ -108,7 +108,7 @@ function importAsciiSTL(file::IO; topology=false)
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
     vts = Vertex[]
-    fcs = Face[]
+    fcs = Face{Int}[]
 
     vert_count = 0
     vert_idx = [0,0,0]

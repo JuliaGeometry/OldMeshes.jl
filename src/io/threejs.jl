@@ -17,7 +17,7 @@ function exportThreejs(msh::Mesh, str::IO, closeAfterwards::Bool)
 
     json = Dict()
 
-    json["faces"] = Int64[]
+    json["faces"] = Int[]
     for i=1:nF
         push!(json["faces"], 0, fcs[i].v1-1, fcs[i].v2-1, fcs[i].v3-1)
     end

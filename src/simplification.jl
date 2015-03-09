@@ -28,15 +28,15 @@
 export simplify
 
 type HalfEdge
-    source   :: Int64 # vertex index at the root of the half-edge
-    next     :: Int64 # the next edge in this (oriented) face
-    opposite :: Int64 # the other edge in the adjoining face (if not on bdy)
+    source   :: Int # vertex index at the root of the half-edge
+    next     :: Int # the next edge in this (oriented) face
+    opposite :: Int # the other edge in the adjoining face (if not on bdy)
     HalfEdge(s,n,o) = new(s,n,o)
 end
 
 type CollapsibleMesh
     vPositions :: Vector{Vertex}
-    vEdges     :: Vector{Int64}
+    vEdges     :: Vector{Int}
     edges      :: Vector{HalfEdge}
 end
 
@@ -120,7 +120,7 @@ function isCollapsibleEdge(cm,e)
 end
 
 # edge collapse
-function collapse!(cm::CollapsibleMesh, e::Int64, pos::Vertex)
+function collapse!(cm::CollapsibleMesh, e::Int, pos::Vertex)
         
     if !isCollapsibleEdge(cm,e) return false end
 
@@ -239,9 +239,9 @@ function CollapsibleMesh(m::Mesh)
 
     # make edge, vEdge lists &
     # build edge dictionary
-    vs = Array(Int64,nVts)
+    vs = Array(Int,nVts)
     es = Array(HalfEdge,3*nFcs)
-    edgeDict = Dict{(Int64,Int64),Int64}()
+    edgeDict = Dict{(Int,Int),Int}()
     for i = 1:nFcs
         fc = fcs[i]
 
@@ -291,7 +291,7 @@ function Mesh(cm::CollapsibleMesh)
     # get vertex positions, create reverse map
     nV = length(vs)
     vts = Array(Vertex,nV)
-    invV = zeros(Int64,nVold)
+    invV = zeros(Int,nVold)
     ix = 1
     for v = vs
         vts[ix] = position(cm,v)
@@ -332,7 +332,7 @@ end
 
 # determines an error quadric associated with the given vertex
 typealias Quadric Matrix4x4{Float64}
-function quadric(cm::CollapsibleMesh, v::Int64)
+function quadric(cm::CollapsibleMesh, v::Int)
     q = zero(Quadric)
     if !isBoundaryVertex(cm,v)
         e = edge(cm,v)
@@ -362,7 +362,7 @@ end
 # helper type for edge heap
 immutable HeapNode
     cost     :: Float64
-    edge     :: Int64
+    edge     :: Int
     position :: Vertex
     HeapNode(c,e,p) = new(c,e,p)
 end

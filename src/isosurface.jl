@@ -138,7 +138,7 @@ function hasFaces{T<:Real}(vals::NTuple{8,T}, iso::T)
 end
 
 # Determines which case in the triangle table we are dealing with
-function tetIx{T<:Real}(tIx::Int64, vals::NTuple{8,T}, iso::T)
+function tetIx{T<:Real}(tIx::Int, vals::NTuple{8,T}, iso::T)
     ifelse(vals[subTets[1,tIx]] < iso, 1, 0) +
     ifelse(vals[subTets[2,tIx]] < iso, 2, 0) +
     ifelse(vals[subTets[3,tIx]] < iso, 4, 0) +
@@ -150,8 +150,8 @@ end
 # two edges get the same index) and unique (every edge gets the same ID
 # regardless of which of its neighboring voxels is asking for it) in order
 # for vertex sharing to be implemented properly.
-function vertId(e::Int64, x::Int64, y::Int64, z::Int64,
-                nx::Int64, ny::Int64)
+function vertId(e::Int, x::Int, y::Int, z::Int,
+                nx::Int, ny::Int)
     dx = voxCrnrPos[voxEdgeCrnrs[e][1]]
     voxEdgeDir[e]+7*(x-1+dx[1]+nx*(y-1+dx[2]+ny*(z-1+dx[3])))
 end
@@ -160,7 +160,7 @@ end
 # occurs.
 # eps represents the "bump" factor to keep vertices away from voxel
 # corners (thereby preventing degeneracies).
-function vertPos{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
+function vertPos{T<:Real}(e::Int, x::Int, y::Int, z::Int,
                           vals::NTuple{8,T}, iso::T, eps::T)
     ixs = voxEdgeCrnrs[e]
     srcVal = float(vals[ixs[1]])
@@ -177,10 +177,10 @@ end
 
 # Gets the vertex ID, adding it to the vertex dictionary if not already
 # present.
-function getVertId{T<:Real}(e::Int64, x::Int64, y::Int64, z::Int64,
-                            nx::Int64, ny::Int64,
+function getVertId{T<:Real}(e::Int, x::Int, y::Int, z::Int,
+                            nx::Int, ny::Int,
                             vals::NTuple{8,T}, iso::T,
-                            vts::Dict{Int64,Vertex},
+                            vts::Dict{Int,Vertex},
                             eps::T)
     vId = vertId(e,x,y,z,nx,ny)
     if !haskey(vts,vId)
@@ -191,7 +191,7 @@ end
 
 # Given a sub-tetrahedron case and a tetrahedron edge ID, determines the
 # corresponding voxel edge ID.
-function voxEdgeId(subTetIx::Int64, tetEdgeIx::Int64)
+function voxEdgeId(subTetIx::Int, tetEdgeIx::Int)
     srcVoxCrnr = subTets[tetEdgeCrnrs[1,tetEdgeIx],subTetIx]
     tgtVoxCrnr = subTets[tetEdgeCrnrs[2,tetEdgeIx],subTetIx]
     voxEdgeIx[srcVoxCrnr,tgtVoxCrnr]
@@ -200,9 +200,9 @@ end
 # Processes a voxel, adding any new vertices and faces to the given
 # containers as necessary.
 function procVox{T<:Real}(vals::NTuple{8,T}, iso::T,
-                          x::Int64, y::Int64, z::Int64,
-                          nx::Int64, ny::Int64,
-                          vts::Dict{Int64,Vertex}, fcs::Vector{Face},
+                          x::Int, y::Int, z::Int,
+                          nx::Int, ny::Int,
+                          vts::Dict{Int,Vertex}, fcs::Vector,
                           eps::T)
 
     # check each sub-tetrahedron in the voxel
@@ -233,8 +233,8 @@ end
 # Given a 3D array and an isovalue, extracts a mesh represention of the 
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real}(lsf::AbstractArray{T,3},iso::T,eps::T)
-    vts = Dict{Int64,Vertex}()
-    fcs = Array(Face,0)
+    vts = Dict{Int,Vertex}()
+    fcs = Array(Face{Int},0)
 
     # process each voxel
     (nx,ny,nz) = size(lsf)
@@ -253,13 +253,13 @@ function isosurface(lsf,isoval,eps)
     (vts,fcs) = marchingTetrahedra(lsf,isoval,eps)
 
     # normalize the mesh representation
-    vtD = Dict{Int64,Int64}()
+    vtD = Dict{Int,Int}()
     k = 1
     for x in keys(vts)
         vtD[x] = k
         k += 1
     end
-    fcAry = [Face(vtD[f.v1],vtD[f.v2],vtD[f.v3]) for f in fcs]
+    fcAry = Face{Int}[Face(vtD[f.v1],vtD[f.v2],vtD[f.v3]) for f in fcs]
     vtAry = collect(values(vts))
 
     Mesh(vtAry,fcAry)
