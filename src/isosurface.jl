@@ -218,7 +218,7 @@ function procVox{T<:Real}(vals::NTuple{8,T}, iso::T,
             if e1 == 0 break end
 
             # add the face to the list
-            fc = Face(getVertId(voxEdgeId(i,e1),x,y,z,nx,ny,vals,iso,vts,eps),
+            fc = Face{Int}(getVertId(voxEdgeId(i,e1),x,y,z,nx,ny,vals,iso,vts,eps),
                       getVertId(voxEdgeId(i,e2),x,y,z,nx,ny,vals,iso,vts,eps),
                       getVertId(voxEdgeId(i,e3),x,y,z,nx,ny,vals,iso,vts,eps))
             push!(fcs, fc)

@@ -77,7 +77,7 @@ end
 
 function importAsciiPly(io::IO; topology=false)
     vts = Vertex[]
-    fcs = Face[]
+    fcs = Face{Int}[]
 
     nV = 0
     nF = 0
@@ -107,7 +107,7 @@ function importAsciiPly(io::IO; topology=false)
         txt = readline(io)   # 3 0 1 2
         fs = [int(i) for i in split(txt)]
         for i = 3:fs[1] #triangulate
-            push!(fcs, Face(fs[2]+1, fs[i]+1, fs[i+1]+1))
+            push!(fcs, Face{Int}(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
     end
 
@@ -118,11 +118,11 @@ function importAsciiPly(io::IO; topology=false)
             v1 = findfirst(uvts, vts[fcs[i].v1])
             v2 = findfirst(uvts, vts[fcs[i].v2])
             v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face(v1,v2,v3)
+            fcs[i] = Face{Int}(v1,v2,v3)
         end
         vts = uvts
     end
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Face{Int}}(vts, fcs, topology)
 end
 

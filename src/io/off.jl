@@ -43,8 +43,7 @@ end
 function importOFF(io::IO; topology=false)
 
     local vts
-    fcs = Face[] # faces might be triangulated, so we can't assume count
-
+    fcs = Face{Int}[] # faces might be triangulated, so we can't assume count
     nV = 0
     nF = 0
 
@@ -63,15 +62,15 @@ function importOFF(io::IO; topology=false)
             end
             continue
         elseif found_counts # read faces
-            face = map(int64, split(txt))
+            face = map(int, split(txt))
             if length(face) >= 4
                 for i = 4:length(face) #triangulate
-                    push!(fcs, Face(face[2]+1, face[i-1]+1, face[i]+1))
+                    push!(fcs, Face{Int}(face[2]+1, face[i-1]+1, face[i]+1))
                 end
             end
             continue
         elseif !found_counts && isdigit(split(txt)[1]) # vertex and face counts
-            counts = map(int64, split(txt))
+            counts = map(int, split(txt))
             nV = counts[1]
             nF = counts[2]
             vts = Array(Vertex, nV)
@@ -86,10 +85,10 @@ function importOFF(io::IO; topology=false)
             v1 = findfirst(uvts, vts[fcs[i].v1])
             v2 = findfirst(uvts, vts[fcs[i].v2])
             v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face(v1,v2,v3)
+            fcs[i] = Face{Int}(v1,v2,v3)
         end
         vts = uvts
     end
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Face{Int}}(vts, fcs, topology)
 end

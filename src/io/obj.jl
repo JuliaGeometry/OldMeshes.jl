@@ -10,7 +10,7 @@ end
 
 function importOBJ(io::IO; topology=false)
     vts = Vertex[]
-    fcs = Face[]
+    fcs = Face{Int}[]
 
     nV = 0
     nF = 0
@@ -26,7 +26,7 @@ function importOBJ(io::IO; topology=false)
             #get verts
             verts = [int(split(line[i], "/")[1]) for i = 2:length(line)]
             for i = 3:length(verts) #triangulate
-                push!(fcs, Face(verts[1], verts[i-1], verts[i]))
+                push!(fcs, Face{Int}(verts[1], verts[i-1], verts[i]))
             end
         end
     end
@@ -38,11 +38,11 @@ function importOBJ(io::IO; topology=false)
             v1 = findfirst(uvts, vts[fcs[i].v1])
             v2 = findfirst(uvts, vts[fcs[i].v2])
             v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face(v1,v2,v3)
+            fcs[i] = Face{Int}(v1,v2,v3)
         end
         vts = uvts
     end
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Face{Int}}(vts, fcs, topology)
 end
 
