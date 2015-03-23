@@ -8,7 +8,7 @@ julia:
 notifications:
   email: false
 script:
-    - julia -e 'Pkg.init(); Pkg.clone(pwd())'
+    - julia -e 'Pkg.clone(pwd())'
     - julia -e 'Pkg.add("Lint");'
     - julia -e 'Pkg.test("Meshes", coverage=true)'
 
