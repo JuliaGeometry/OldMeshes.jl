@@ -8,6 +8,7 @@ julia:
 notifications:
   email: false
 script:
+    - git fetch --unshallow
     - julia -e 'Pkg.clone(pwd())'
     - julia -e 'Pkg.add("Lint");'
     - julia -e 'Pkg.test("Meshes", coverage=true)'
