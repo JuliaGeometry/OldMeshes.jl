@@ -43,6 +43,6 @@ function importOBJ(io::IO; topology=false)
         vts = uvts
     end
 
-    return Mesh{Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
 end
 

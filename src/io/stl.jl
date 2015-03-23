@@ -93,7 +93,7 @@ function importBinarySTL(file::IO; topology=false, read_header=false)
         push!(fcs, Face{Int}(vert_idx...))
     end
 
-    return Mesh{Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
 end
 
 function importAsciiSTL(file::String; topology=false)
@@ -136,5 +136,5 @@ function importAsciiSTL(file::IO; topology=false)
         end
     end
 
-    return Mesh{Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
 end

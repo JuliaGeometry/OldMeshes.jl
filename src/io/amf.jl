@@ -19,7 +19,7 @@ function importAMF(io::IO; topology=false)
         push!(vts, Vertex(float64(x), float64(y), float64(z)))
     end
 
-    meshes = Mesh{Face{Int}}[]
+    meshes = Mesh{Vertex, Face{Int}}[]
 
     for volume in volumes
         fcs = Face{Int}[]
