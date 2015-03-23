@@ -65,7 +65,7 @@ function importBinarySTL(file::IO; topology=false, read_header=false)
                                    float64(read(file, Float32)))
 
     vts = Vertex[]
-    fcs = Face[]
+    fcs = Face{Int}[]
 
     if !read_header
         readbytes(file, 80) # throw out header
@@ -90,10 +90,10 @@ function importBinarySTL(file::IO; topology=false, read_header=false)
             end
         end
         skip(file, 2) # throwout 16bit attribute
-        push!(fcs, Face(vert_idx...))
+        push!(fcs, Face{Int}(vert_idx...))
     end
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Face{Int}}(vts, fcs, topology)
 end
 
 function importAsciiSTL(file::String; topology=false)
@@ -132,9 +132,9 @@ function importAsciiSTL(file::IO; topology=false)
             end
             readline(file) # throwout endloop
             readline(file) # throwout endfacet
-            push!(fcs, Face(vert_idx...))
+            push!(fcs, Face{Int}(vert_idx...))
         end
     end
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Face{Int}}(vts, fcs, topology)
 end

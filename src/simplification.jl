@@ -300,7 +300,7 @@ function Mesh(cm::CollapsibleMesh)
     end
 
     # collect faces
-    fcs = Array(Face,0)
+    fcs = Array(Face{Int},0)
     nE = length(cm.edges)
     for e = 1:3:nE
         if !isDeletedEdge(cm,e)
@@ -308,7 +308,7 @@ function Mesh(cm::CollapsibleMesh)
             v1 = invV[source(cm,e)]
             v2 = invV[source(cm,e+1)]
             v3 = invV[source(cm,e+2)]
-            push!(fcs,Face(v1,v2,v3))
+            push!(fcs,Face{Int}(v1,v2,v3))
         end
     end
 

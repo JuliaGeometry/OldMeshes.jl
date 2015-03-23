@@ -78,7 +78,7 @@ function importThreejs( fn::String, topology=true )
     end
 
     vts = Vertex[]
-    fcs = Face[]
+    fcs = Face{Int}[]
 
     nV = length(json["vertices"])
 
@@ -103,12 +103,12 @@ function importThreejs( fn::String, topology=true )
 
         if isQuad
             # convert quad to two tri
-            push!(fcs, Face(json["faces"][i]+1, json["faces"][i+1]+1, json["faces"][i+2]+1))
-            push!(fcs, Face(json["faces"][i]+1, json["faces"][i+2]+1, json["faces"][i+3]+1))
+            push!(fcs, Face{Int}(json["faces"][i]+1, json["faces"][i+1]+1, json["faces"][i+2]+1))
+            push!(fcs, Face{Int}(json["faces"][i]+1, json["faces"][i+2]+1, json["faces"][i+3]+1))
             i += 4
             nVertices = 4
         else
-            push!(fcs, Face(json["faces"][i]+1, json["faces"][i+1]+1, json["faces"][i+2]+1))
+            push!(fcs, Face{Int}(json["faces"][i]+1, json["faces"][i+1]+1, json["faces"][i+2]+1))
             i += 3
             nVertices = 3
         end

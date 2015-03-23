@@ -19,16 +19,16 @@ function importAMF(io::IO; topology=false)
         push!(vts, Vertex(float64(x), float64(y), float64(z)))
     end
 
-    meshes = Mesh[]
+    meshes = Mesh{Face{Int}}[]
 
     for volume in volumes
-        fcs = Face[]
+        fcs = Face{Int}[]
         triangles = get_elements_by_tagname(volume, "triangle")
         for triangle in triangles
             v1 = content(find_element(triangle, "v1"))
             v2 = content(find_element(triangle, "v2"))
             v3 = content(find_element(triangle, "v3"))
-            push!(fcs, Face(int64(v1), int64(v2), int64(v3)))
+            push!(fcs, Face{Int}(int(v1), int(v2), int(v3)))
         end
         push!(meshes, Mesh(vts, fcs))
     end
