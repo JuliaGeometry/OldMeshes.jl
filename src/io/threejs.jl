@@ -145,5 +145,5 @@ function importThreejs( fn::String, topology=true )
 
     topology = false
 
-    return Mesh(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
 end

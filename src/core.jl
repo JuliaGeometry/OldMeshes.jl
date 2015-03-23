@@ -17,10 +17,10 @@ end
 Face{T}(v::AbstractArray{T}) = Face{T}(v[1], v[2], v[3])
 
 
-abstract AbstractMesh{F}
+abstract AbstractMesh{V, F}
 
-type Mesh{F} <: AbstractMesh{F}
-    vertices :: Vector{Vertex}
+type Mesh{V, F} <: AbstractMesh{V, F}
+    vertices :: Vector{V}
     faces :: Vector{F}
     has_topology :: Bool
 end
@@ -33,7 +33,7 @@ faces(m::Mesh) = m.faces
 Base.isempty(m::Mesh) = isempty(m.vertices) && isempty(m.faces)
 
 # concatenates two meshes
-function merge{F}(m1::AbstractMesh{F}, m2::AbstractMesh{F})
+function merge{V, F}(m1::AbstractMesh{V, F}, m2::AbstractMesh{V, F})
     v1 = vertices(m1)
     f1 = faces(m1)
     v2 = vertices(m2)

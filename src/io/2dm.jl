@@ -37,7 +37,7 @@ function import2dm(con::IO)
             continue
         end
     end
-    Mesh{Face{Int}}(nd,ele)
+    Mesh{Vertex, Face{Int}}(nd,ele)
 end
 
 
