@@ -114,7 +114,7 @@ function importAsciiSTL(file::IO; topology=false)
     vert_idx = [0,0,0]
     while !eof(file)
         line = split(lowercase(readline(file)))
-        if line[1] == "facet"
+        if !isempty(line) && line[1] == "facet"
             normal = Vertex(float64(line[3:5])...)
             readline(file) # Throw away outerloop
             for i = 1:3
