@@ -1,4 +1,4 @@
-
+# TODO Return type channges based on pair value
 function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Array{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
@@ -144,3 +144,59 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Array{Floa
     paired_slices
 end
 
+
+function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Array{Int})
+
+    height_ct = length(heights)
+    slices = Vector{(Vector2{Int}, Vector2{Int})}[(Vector2{Int}, Vector2{Int})[] for i = 1:height_ct]
+
+    for face in mesh.faces
+        v1 = mesh.vertices[face.v1]
+        v2 = mesh.vertices[face.v2]
+        v3 = mesh.vertices[face.v3]
+        zmax = max(v1[3], v2[3], v3[3])
+        zmin = min(v1[3], v2[3], v3[3])
+        for i = 1:height_ct
+            height = heights[i]
+            if height > zmax
+                break
+            elseif zmin <= height
+                if v1[3] < height && v2[3] >= height && v3[3] >= height
+                    p1 = v1
+                    p2 = v3
+                    p3 = v2
+                elseif v1[3] > height && v2[3] < height && v3[3] < height
+                    p1 = v1
+                    p2 = v2
+                    p3 = v3
+                elseif v2[3] < height && v1[3] >= height && v3[3] >= height
+                    p1 = v2
+                    p2 = v1
+                    p3 = v3
+                elseif v2[3] > height && v1[3] < height && v3[3] < height
+                    p1 = v2
+                    p2 = v3
+                    p3 = v1
+                elseif v3[3] < height && v2[3] >= height && v1[3] >= height
+                    p1 = v3
+                    p2 = v2
+                    p3 = v1
+                elseif v3[3] > height && v2[3] < height && v1[3] < height
+                    p1 = v3
+                    p2 = v1
+                    p3 = v2
+                else
+                    continue
+                end
+
+                start = Vector2{Int}(round(Int, p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3])),
+                                     round(Int, p1[2] + (p2[2] - p1[2]) * (height - p1[3]) / (p2[3] - p1[3])))
+                finish = Vector2{Int}(round(Int, p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3])),
+                                      round(Int, p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3])))
+
+                push!(slices[i], (start, finish))
+            end
+        end
+    end
+    slices
+end
