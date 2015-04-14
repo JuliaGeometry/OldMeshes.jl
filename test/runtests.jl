@@ -1,5 +1,6 @@
 using Base.Test
 using Meshes
+using ImmutableArrays
 
 include("test_types.jl")
 include("test_meshes.jl")
