@@ -3,8 +3,7 @@ export Vertex,
        AbstractMesh,
        Mesh,
        vertices,
-       faces,
-       merge
+       faces
 
 typealias Vertex Vector3{Float64}
 
@@ -33,7 +32,7 @@ faces(m::Mesh) = m.faces
 Base.isempty(m::Mesh) = isempty(m.vertices) && isempty(m.faces)
 
 # concatenates two meshes
-function merge{V, F}(m1::AbstractMesh{V, F}, m2::AbstractMesh{V, F})
+function Base.merge{V, F}(m1::AbstractMesh{V, F}, m2::AbstractMesh{V, F})
     v1 = vertices(m1)
     f1 = faces(m1)
     v2 = vertices(m2)
