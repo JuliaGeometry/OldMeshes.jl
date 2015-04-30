@@ -72,48 +72,48 @@ const voxEdgeDir = [1,0,1,0,1,0,1,0,2,2,2,2,3,4,5,3,4,5,6]
 
 # For a pair of corner IDs, the edge ID joining them
 # 0 denotes a pair with no edge
-const voxEdgeIx = [[ 0  1 13  4  9 15 19 14],
-                   [ 1  0  2  0  0 10 17  0],
-                   [13  2  0  3  0  0 11  0],
-                   [ 4  0  3  0  0  0 18 12],
-                   [ 9  0  0  0  0  5 16  8],
-                   [15 10  0  0  5  0  6  0],
-                   [19 17 11 18 16  6  0  7],
-                   [14  0  0 12  8  0  7  0]]
+const voxEdgeIx = [ 0  1 13  4  9 15 19 14;
+                    1  0  2  0  0 10 17  0;
+                   13  2  0  3  0  0 11  0;
+                    4  0  3  0  0  0 18 12;
+                    9  0  0  0  0  5 16  8;
+                   15 10  0  0  5  0  6  0;
+                   19 17 11 18 16  6  0  7;
+                   14  0  0 12  8  0  7  0]
 
 # voxel corners that comprise each of the six tetrahedra
-const subTets = [[1 3 2 7],
-                 [1 8 4 7],
-                 [1 4 3 7],
-                 [1 2 6 7],
-                 [1 5 8 7],
-                 [1 6 5 7]]'
+const subTets = [1 3 2 7;
+                 1 8 4 7;
+                 1 4 3 7;
+                 1 2 6 7;
+                 1 5 8 7;
+                 1 6 5 7]'
 
 # tetrahedron corners for each edge (indices 1-4)
-const tetEdgeCrnrs = [[1 2],
-                      [2 3],
-                      [1 3],
-                      [1 4],
-                      [2 4],
-                      [3 4]]'
+const tetEdgeCrnrs = [1 2;
+                      2 3;
+                      1 3;
+                      1 4;
+                      2 4;
+                      3 4]'
 
 # triangle cases for a given tetrahedron edge code
-const tetTri = [[0 0 0 0 0 0],
-                [1 3 4 0 0 0],
-                [1 5 2 0 0 0],
-                [3 5 2 3 4 5],
-                [2 6 3 0 0 0],
-                [1 6 4 1 2 6],
-                [1 5 6 1 6 3],
-                [4 5 6 0 0 0],
-                [4 6 5 0 0 0],
-                [1 6 5 1 3 6],
-                [1 4 6 1 6 2],
-                [2 3 6 0 0 0],
-                [3 2 5 3 5 4],
-                [1 2 5 0 0 0],
-                [1 4 3 0 0 0],
-                [0 0 0 0 0 0]]'
+const tetTri = [0 0 0 0 0 0;
+                1 3 4 0 0 0;
+                1 5 2 0 0 0;
+                3 5 2 3 4 5;
+                2 6 3 0 0 0;
+                1 6 4 1 2 6;
+                1 5 6 1 6 3;
+                4 5 6 0 0 0;
+                4 6 5 0 0 0;
+                1 6 5 1 3 6;
+                1 4 6 1 6 2;
+                2 3 6 0 0 0;
+                3 2 5 3 5 4;
+                1 2 5 0 0 0;
+                1 4 3 0 0 0;
+                0 0 0 0 0 0]'
 
 # Checks if a voxel has faces. Should be false for most voxels.
 # This function should be made as fast as possible.
