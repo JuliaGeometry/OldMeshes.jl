@@ -270,15 +270,20 @@ end
 function isosurface(lsf, isoval, eps, indextype=Cuint, index_start=zero(Int))
     # get marching tetrahedra version of the mesh
     (vts, fcs) = marchingTetrahedra(lsf, isoval, eps, indextype)
+    for elem in fcs 
+        if any(x->x==1, elem)
+            println(elem)
+        end
+    end
     # normalize the mesh representation
-    vtD = Dict{Int,Int}()
+    vtD = Dict{indextype,indextype}()
     sizehint!(vtD, length(vts))
-    k   = index_start
+    k = index_start
     for x in keys(vts)
         vtD[x] = k
-        k += one(Int)
+        k += one(indextype)
     end
-    fcAry = Triangle{Int}[Triangle{Int}(vtD[f[1]], vtD[f[2]], vtD[f[3]]) for f in fcs]
+    fcAry = Face3{indextype, -1}[Face3{indextype, -1}(vtD[f[1]], vtD[f[2]], vtD[f[3]]) for f in fcs]
     vtAry = collect(values(vts))
 
     vtAry, fcAry
@@ -291,6 +296,5 @@ function call{MT <: Mesh, T}(::Type{MT}, volume::Array{T, 3}, iso_val::Real, eps
     iso_val = convert(T, iso_val)
     eps_val = convert(T, eps_val)
     vts, fcs = isosurface(volume, iso_val, eps_val, eltype(facetype(MT)))
-    println(size(vts))
     MT(vts, fcs)
 end

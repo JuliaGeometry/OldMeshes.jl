@@ -15,30 +15,8 @@ import Base.convert
 import Base.getindex
 import Base.show
 
-
-include("core.jl")
-export facetype
-export attributes
-export Mesh
-export HomogenousMesh
-export HMesh
-export NormalMesh
-export UVWMesh
-export UVMesh2D
-export UVMesh
-export PlainMesh
-export Mesh2D
-export NormalAttributeMesh
-export NormalColorMesh
-
-export GLMesh2D
-export GLNormalMesh
-export GLUVWMesh
-export GLUVMesh2D
-export GLUVMesh
-export GLPlainMesh
-export GLNormalAttributeMesh
-export GLNormalColorMesh
+using MeshIO
+importall MeshIO
 
 include("primitives.jl")
 include("merge.jl")
@@ -47,6 +25,8 @@ include("algorithms.jl")
 include("io.jl")
 include("isosurface.jl")
 export isosurface
+
+
 include("csg.jl")
 #include("slice.jl")
 #include("simplification.jl")

@@ -19,28 +19,27 @@ function getindex{NT}(q::Quad, T::Type{Normal3{NT}})
     normal = normalize(cross(q.width, q.height))
     T[normal for i=1:4]
 end
-function getindex{ET}(q::Quad, T::Type{Point3{ET}})
-	T[
-        q.downleft,
-        q.downleft + q.height,
-        q.downleft + q.width + q.height,
-        q.downleft + q.width
-    ]
-end
-function getindex{ET}(q::Quad, T::Type{Triangle{ET}})
-	T[T(0,1,2), T(2,3,0)]
-end
-function getindex{ET}(q::Quad, T::Type{UV{ET}})
-	T[T(0,0), T(0,0), T(1,1), T(1,1)]
-end
-function getindex{ET}(q::Quad, T::Type{UVW{ET}})
-	T[
-        q.downleft,
-        q.downleft + q.height,
-        q.downleft + q.width + q.height,
-        q.downleft + q.width
-    ]
-end
+getindex{ET}(q::Quad, T::Type{Point3{ET}}) = T[
+    q.downleft,
+    q.downleft + q.height,
+    q.downleft + q.width + q.height,
+    q.downleft + q.width
+]
+
+getindex{FT, IndexOffset}(q::Quad, T::Type{Face3{FT, IndexOffset}}) = T[
+    T(1,2,3)+IndexOffset, T(3,4,1)+IndexOffset
+]
+
+getindex{ET}(q::Quad, T::Type{UV{ET}}) = T[
+    T(0,0), T(0,0), T(1,1), T(1,1)
+]
+
+getindex{ET}(q::Quad, T::Type{UVW{ET}}) = T[
+    q.downleft,
+    q.downleft + q.height,
+    q.downleft + q.width + q.height,
+    q.downleft + q.width
+]
 
 getindex{UVT}(r::Rectangle, T::Type{UV{UVT}}) = T[
     T(0, 0),
@@ -48,8 +47,9 @@ getindex{UVT}(r::Rectangle, T::Type{UV{UVT}}) = T[
     T(1, 1),
     T(1, 0)
 ]
-getindex{FT}(r::Rectangle, T::Type{Triangle{FT}}) = T[
-	T(0,1,2), T(2,3,0)
+
+getindex{FT, IndexOffset}(r::Rectangle, T::Type{Face3{FT, IndexOffset}}) = T[
+    T(1,2,3)+IndexOffset, T(3,4,1)+IndexOffset
 ]
 
 getindex{PT}(r::Rectangle, T::Type{Point2{PT}}) = T[
