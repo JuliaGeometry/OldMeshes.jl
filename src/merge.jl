@@ -40,5 +40,5 @@ function Base.merge{N, _1, _2, _3, _4, ConstAttrib <: Color, _5, _6}(meshes::NTu
     attribs[:faces]         = faces
     attribs[:attributes]    = color_attrib
     attribs[:attribute_id]  = index
-    return HMesh(attribs)
+    return HMesh{_1, _2, _3, _4, Void, _5, _6}(attribs)
 end
