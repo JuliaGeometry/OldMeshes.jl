@@ -270,11 +270,6 @@ end
 function isosurface(lsf, isoval, eps, indextype=Cuint, index_start=zero(Int))
     # get marching tetrahedra version of the mesh
     (vts, fcs) = marchingTetrahedra(lsf, isoval, eps, indextype)
-    for elem in fcs 
-        if any(x->x==1, elem)
-            println(elem)
-        end
-    end
     # normalize the mesh representation
     vtD = Dict{indextype,indextype}()
     sizehint!(vtD, length(vts))
