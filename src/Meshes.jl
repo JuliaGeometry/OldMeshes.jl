@@ -22,7 +22,7 @@ include("primitives.jl")
 include("merge.jl")
 include("algorithms.jl")
 
-include("io.jl")
+#include("io.jl")
 include("isosurface.jl")
 export isosurface
 
