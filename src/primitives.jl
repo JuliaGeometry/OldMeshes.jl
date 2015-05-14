@@ -59,3 +59,25 @@ getindex{PT}(r::Rectangle, T::Type{Point2{PT}}) = T[
     T(r.x + r.w, r.y + r.h),
     T(r.x + r.w, r.y)
 ]
+
+
+
+convert{T <: HMesh}(meshtype::Type{T}, c::Pyramid)                      = T(c[vertextype(T)], c[facetype(T)])
+getindex{FT, IndexOffset}(r::Pyramid, T::Type{Face3{FT, IndexOffset}})  = reinterpret(T, collect(map(FT,(1:18)+IndexOffset)))
+function getindex{PT}(p::Pyramid, T::Type{Point3{PT}})
+    leftup   = T(-p.width , p.width, 0) / 2f0
+    leftdown = T(-p.width, -p.width, 0) / 2f0
+    tip = T(p.middle + T(0,0,p.length))
+    lu  = T(p.middle + leftup)
+    ld  = T(p.middle + leftdown)
+    ru  = T(p.middle - leftdown)
+    rd  = T(p.middle - leftup)
+    T[
+        tip, rd, ru,
+        tip, ru, lu,
+        tip, lu, ld,
+        tip, ld, rd,
+        rd,  ru, lu,
+        lu,  ld, rd
+    ]
+end
