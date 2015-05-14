@@ -13,6 +13,18 @@ function Base.unique(m::Mesh)
 end
 
 
+import Base.(*)
+
+immutable MeshMulFunctor{T} <: Base.Func{2}
+    matrix::Matrix4x4{T}
+end
+Base.call{T}(m::MeshMulFunctor{T}, vert) = Vector3{T}(m.matrix*Vector4{T}(vert..., 1))
+function *{T}(m::Matrix4x4{T}, mesh::Mesh)
+    msh = deepcopy(mesh)
+    map!(MeshMulFunctor(m), msh.vertices)
+    msh
+end
+
 
 
 
