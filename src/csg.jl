@@ -15,7 +15,7 @@ function volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
     y_rng = y_max - y_min
     z_rng = z_max - z_min
 
-    nx, ny, nz = int(scale*x_rng), int(scale*y_rng), int(scale*z_rng)
+    nx, ny, nz = Int(scale*x_rng), Int(scale*y_rng), Int(scale*z_rng)
 
     vol = zeros(Float64, (nx,ny,nz))
 
