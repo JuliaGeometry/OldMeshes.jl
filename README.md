@@ -37,7 +37,7 @@ By default we do not check topology for repeat vertices since it can be computat
 
 ### Export
 Support export formats:
-* [ASCII STL](https://en.wikipedia.org/wiki/STL_%28file_format%29)
+* [Binary and ASCII STL](https://en.wikipedia.org/wiki/STL_%28file_format%29)
 * [Aquaveo-SMS 2DM](http://www.xmswiki.com/xms/SMS:2D_Mesh_Files_*.2dm)
 * [Binary and ASCII PLY](https://en.wikipedia.org/wiki/PLY)
 * [OFF](https://en.wikipedia.org/wiki/OFF_%28file_format%29)
