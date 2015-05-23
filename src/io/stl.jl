@@ -1,4 +1,5 @@
 export exportStl,
+       exportBinaryStl,
        importBinarySTL,
        importAsciiSTL
 
@@ -8,7 +9,7 @@ function exportStl(msh::Mesh, fn::String)
   exportStl(msh, open(fn, "w"))
 end
 
-function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool)
+function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -42,7 +43,38 @@ function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool)
     end
 end
 
-exportStl(msh::Mesh, str::IO) = exportStl(msh, str, true)
+function exportBinaryStl(msh::Mesh, fn::String)
+  exportBinaryStl(msh, open(fn, "w"))
+end
+
+function exportBinaryStl(msh, str::IO, closeAfterwards::Bool=true)
+    # Implementation made according to https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
+    vts = msh.vertices
+    fcs = msh.faces
+    nF = size(fcs,1)
+    
+    for i in 1:80 # write empty header
+        write(str,0x00)
+    end
+
+    write(str, uint32(nF)) # write triangle count
+    for i = 1:nF
+        f = fcs[i]
+        n = Float32[0,0,0] # TODO: properly compute normal(f)
+        for i=1:3; write(str, n[i]); end # write normal
+        
+        for v in [f.v1, f.v2, f.v3]
+            for j = 1:3
+                write(str, float32(vts[v][j])) # write vertex coordinates
+            end
+        end
+        write(str,0x0000) # write two empty Uint8
+    end
+    
+    if closeAfterwards
+        close(str)
+    end
+end
 
 function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
   exportSTL(msh, io)
