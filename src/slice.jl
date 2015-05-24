@@ -1,5 +1,5 @@
 # TODO Return type channges based on pair value
-function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Array{Float64}, pair=true; eps=0.00001, autoeps=true)
+function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
     slices = [(Vector2{Float64}, Vector2{Float64})[] for i = 1:height_ct]
@@ -145,7 +145,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Array{Floa
 end
 
 
-function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Array{Int})
+function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Vector{Int})
 
     height_ct = length(heights)
     slices = Vector{(Vector2{Int}, Vector2{Int})}[(Vector2{Int}, Vector2{Int})[] for i = 1:height_ct]
