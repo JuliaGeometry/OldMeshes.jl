@@ -2,7 +2,7 @@
 function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
-    slices = [(Vector2{Float64}, Vector2{Float64})[] for i = 1:height_ct]
+    slices = [@compat Tuple{Vector2{Float64}, Vector2{Float64}}[] for i = 1:height_ct]
 
     for face in mesh.faces
         v1 = mesh.vertices[face.v1]
@@ -57,7 +57,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         return slices
     end
 
-    paired_slices = [Vector{(Vector2{Float64}, Vector2{Float64})}[] for i = 1:height_ct]
+    paired_slices = [Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[] for i = 1:height_ct]
 
     for slice_num = 1:height_ct
         lines = slices[slice_num]
@@ -65,7 +65,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         if line_ct == 0
             continue
         end
-        polys = Vector{(Vector2{Float64}, Vector2{Float64})}[]
+        polys = Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[]
         paired = falses(line_ct)
         start = 1
         seg = 1
@@ -79,7 +79,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
 
         while true
             #Start new polygon with seg
-            poly = (Vector2{Float64}, Vector2{Float64})[]
+            poly = @compat Tuple{Vector2{Float64}, Vector2{Float64}}[]
             push!(poly, lines[seg])
 
             #Pair slice until we get to start point
@@ -148,7 +148,7 @@ end
 function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Vector{Int})
 
     height_ct = length(heights)
-    slices = Vector{(Vector2{Int}, Vector2{Int})}[(Vector2{Int}, Vector2{Int})[] for i = 1:height_ct]
+    slices = Vector{@compat Tuple{Vector2{Int}, Vector2{Int}}}[@compat Tuple{Vector2{Int}, Vector2{Int}}[] for i = 1:height_ct]
 
     for face in mesh.faces
         v1 = mesh.vertices[face.v1]
