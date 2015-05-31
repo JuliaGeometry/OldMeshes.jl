@@ -16,7 +16,7 @@ function importAMF(io::IO; topology=false)
         x = content(find_element(coords, "x"))
         y = content(find_element(coords, "y"))
         z = content(find_element(coords, "z"))
-        push!(vts, Vertex(float64(x), float64(y), float64(z)))
+        push!(vts, Vertex(parse(Float64, x), parse(Float64, y), parse(Float64, z)))
     end
 
     meshes = Mesh{Vertex, Face{Int}}[]
@@ -28,7 +28,7 @@ function importAMF(io::IO; topology=false)
             v1 = content(find_element(triangle, "v1"))
             v2 = content(find_element(triangle, "v2"))
             v3 = content(find_element(triangle, "v3"))
-            push!(fcs, Face{Int}(int(v1), int(v2), int(v3)))
+            push!(fcs, Face{Int}(parse(Int, v1), parse(Int, v2), parse(Int, v3)))
         end
         push!(meshes, Mesh(vts, fcs))
     end

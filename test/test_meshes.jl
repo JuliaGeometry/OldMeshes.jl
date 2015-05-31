@@ -1,4 +1,5 @@
 using Meshes
+using Compat
 
 # make sure we export to test/export
 export_path = Pkg.dir("Meshes")*"/test/export/"
@@ -12,7 +13,7 @@ mkpath(export_path)
 #
 N = 10
 sigma = 1.0
-distance = Float32[ sqrt(float32(i*i+j*j+k*k)) for i = -N:N, j = -N:N, k = -N:N ]
+distance = Float32[ sqrt(@compat Float32(i*i+j*j+k*k)) for i = -N:N, j = -N:N, k = -N:N ]
 distance = distance + sigma*rand(2*N+1,2*N+1,2*N+1)
 
 # Extract an isosurface.

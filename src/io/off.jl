@@ -19,14 +19,15 @@ function exportOFF(msh::Mesh, fn::String, rgba)
     # write the data
     for i = 1:nV
         v = vts[i]
-        txt = @sprintf " %f %f %f\n" float32(v.e1) float32(v.e2) float32(v.e3)
+        txt = @sprintf " %f %f %f\n" (@compat Float32(v.e1)) (@compat Float32(v.e2)) (@compat Float32(v.e3))
         write(str,txt)
     end
 
     for i = 1:nF
         f = fcs[i]
         c = rgba[i,:]
-        txt = @sprintf "  3 %i %i %i  %f %f %f %f\n" int32(f.v1-1) int32(f.v2-1) int32(f.v3-1)  float32(c[1]) float32(c[2]) float32(c[3]) float32(c[4])
+        txt = @sprintf "  3 %i %i %i  %f %f %f %f\n" (@compat Int32(f.v1-1)) (@compat Int32(f.v2-1)) (
+            @compat Int32(f.v3-1))  (@compat Float32(c[1])) (@compat Float32(c[2])) (@compat Float32(c[3])) (@compat Float32(c[4]))
         write(str,txt)
     end
     close(str)

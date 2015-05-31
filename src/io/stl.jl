@@ -52,25 +52,25 @@ function exportBinaryStl(msh, str::IO, closeAfterwards::Bool=true)
     vts = msh.vertices
     fcs = msh.faces
     nF = size(fcs,1)
-    
+
     for i in 1:80 # write empty header
         write(str,0x00)
     end
 
-    write(str, uint32(nF)) # write triangle count
+    write(str, @compat UInt32(nF)) # write triangle count
     for i = 1:nF
         f = fcs[i]
         n = Float32[0,0,0] # TODO: properly compute normal(f)
         for i=1:3; write(str, n[i]); end # write normal
-        
+
         for v in [f.v1, f.v2, f.v3]
             for j = 1:3
-                write(str, float32(vts[v][j])) # write vertex coordinates
+                write(str, @compat Float32(vts[v][j])) # write vertex coordinates
             end
         end
         write(str,0x0000) # write two empty Uint8
     end
-    
+
     if closeAfterwards
         close(str)
     end
@@ -92,9 +92,9 @@ function importBinarySTL(file::IO; topology=false, read_header=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
-    binarySTLvertex(file) = Vertex(float64(read(file, Float32)),
-                                   float64(read(file, Float32)),
-                                   float64(read(file, Float32)))
+    binarySTLvertex(file) = Vertex((@compat Float64(read(file, Float32))),
+                                   (@compat Float64(read(file, Float32))),
+                                   (@compat Float64(read(file, Float32))))
 
     vts = Vertex[]
     fcs = Face{Int}[]
@@ -147,10 +147,10 @@ function importAsciiSTL(file::IO; topology=false)
     while !eof(file)
         line = split(lowercase(readline(file)))
         if !isempty(line) && line[1] == "facet"
-            normal = Vertex(float64(line[3:5])...)
+            normal = Vertex([parse(Float64, x) for x in line[3:5]]...)
             readline(file) # Throw away outerloop
             for i = 1:3
-                vertex = Vertex(float64(split(readline(file))[2:4])...)
+                vertex = Vertex([parse(Float64, x) for x in split(readline(file))[2:4]]...)
                 if topology
                     idx = findfirst(vts, vertex)
                 end

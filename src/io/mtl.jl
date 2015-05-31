@@ -91,10 +91,10 @@ function readMtlFile(io::IO; colortype=Float64)
             remainder = length(line_parts) > 1 ? line[searchindex(line, line_parts[2]):end] : ""
 
             # new material
-            if command == "newmtl" 
+            if command == "newmtl"
                 push!(materials, WavefrontMtlMaterial(colortype))
                 materials[end].name = line_parts[2]
-            # abmient 
+            # abmient
             elseif command == "Ka"
                 materials[end].ambient = parseMtlColor(remainder, colortype)
             # diffuse
@@ -108,7 +108,7 @@ function readMtlFile(io::IO; colortype=Float64)
                 materials[end].transmission_filter = parseMtlColor(remainder, colortype)
             # illumination model
             elseif command == "illum"
-                materials[end].illum = int(line_parts[2])
+                materials[end].illum = parse(Int, line_parts[2])
             # dissolve
             elseif command == "d"
                 if line_parts[2] == "-halo"

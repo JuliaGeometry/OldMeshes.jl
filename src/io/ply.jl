@@ -21,16 +21,16 @@ function exportBinaryPly(msh::Mesh, fn::String)
 
     # write the vertices and faces
     for v in vts
-        write(io, float32(v.e1))
-        write(io, float32(v.e2))
-        write(io, float32(v.e3))
+        write(io, @compat Float32(v.e1))
+        write(io, @compat Float32(v.e2))
+        write(io, @compat Float32(v.e3))
     end
 
     for f in fcs
-        write(io, uint8(3))
-        write(io, int32(f.v1-1))
-        write(io, int32(f.v2-1))
-        write(io, int32(f.v3-1))
+        write(io, @compat Uint8(3))
+        write(io, @compat Int32(f.v1-1))
+        write(io, @compat Int32(f.v2-1))
+        write(io, @compat Int32(f.v3-1))
     end
 
     close(io)
@@ -87,9 +87,9 @@ function importAsciiPly(io::IO; topology=false)
     line = readline(io)
     while !startswith(line, "end_header")
         if startswith(line, "element vertex")
-            nV = int(split(line)[3])
+            nV = parse(Int, split(line)[3])
         elseif startswith(line, "element face")
-            nF = int(split(line)[3])
+            nF = parse(Int, split(line)[3])
         elseif startswith(line, "property")
             push!(properties, line)
         end
@@ -99,13 +99,13 @@ function importAsciiPly(io::IO; topology=false)
     # write the data
     for i = 1:nV
         txt = readline(io)   # -0.018 0.038 0.086
-        vs = [float(i) for i in split(txt)]
+        vs = [parse(Float64, i) for i in split(txt)]
         push!(vts, Vertex(vs[1], vs[2], vs[3]))
     end
 
     for i = 1:nF
         txt = readline(io)   # 3 0 1 2
-        fs = [int(i) for i in split(txt)]
+        fs = [parse(Int, i) for i in split(txt)]
         for i = 3:fs[1] #triangulate
             push!(fcs, Face{Int}(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
