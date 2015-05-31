@@ -10,9 +10,9 @@ function import2dm(file::String)
     return mesh
 end
 
-parseNode(w::Array{String}) = Vertex(float64(w[3]), float64(w[4]), float64(w[5]))
+parseNode(w::Array{String}) = Vertex(parse(Float64, w[3]), parse(Float64, w[4]), parse(Float64, w[5]))
 
-parseTriangle(w::Array{String}) = Face{Int}(int(w[3]), int(w[4]), int(w[5]))
+parseTriangle(w::Array{String}) = Face{Int}(parse(Int, w[3]), parse(Int, w[4]), parse(Int, w[5]))
 
 # Qudrilateral faces are split up into triangles
 function parseQuad(w::Array{String})
