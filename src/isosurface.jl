@@ -293,3 +293,11 @@ function call{MT <: Mesh, T}(::Type{MT}, volume::Array{T, 3}, iso_val::Real, eps
     vts, fcs = isosurface(volume, iso_val, eps_val)
     MT(vts, fcs)
 end
+
+function Mesh{T}(volume::Array{T,3}, iso_val::Real, eps_val=0.001)
+    iso_val = convert(T, iso_val)
+    eps_val = convert(T, eps_val)
+    vts, fcs = isosurface(volume, iso_val, eps_val)
+    Mesh(vts, fcs)
+end
+

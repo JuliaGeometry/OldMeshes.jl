@@ -1,14 +1,14 @@
 # https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
-function importOBJ(fn::String; topology=false)
+function importOBJ(fn::String)
     str = open(fn,"r")
-    mesh = importOBJ(str, topology=topology)
+    mesh = importOBJ(str)
     close(str)
     return mesh
 end
 
 
-function importOBJ(io::IO; topology=false)
+function importOBJ(io::IO)
     vts = Vertex[]
     fcs = Face{Int}[]
 
@@ -31,18 +31,6 @@ function importOBJ(io::IO; topology=false)
         end
     end
 
-    if topology
-        uvts = unique(vts)
-        for i = 1:length(fcs)
-            #repoint indices to unique vertices
-            v1 = findfirst(uvts, vts[fcs[i].v1])
-            v2 = findfirst(uvts, vts[fcs[i].v2])
-            v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face{Int}(v1,v2,v3)
-        end
-        vts = uvts
-    end
-
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end
 

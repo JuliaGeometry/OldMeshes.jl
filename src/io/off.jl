@@ -33,15 +33,15 @@ function exportOFF(msh::Mesh, fn::String, rgba)
     close(str)
 end
 
-function importOFF(fn::String; topology=false)
+function importOFF(fn::String)
     str = open(fn,"r")
-    mesh = importOFF(str, topology=topology)
+    mesh = importOFF(str)
     close(str)
     return mesh
 end
 
 
-function importOFF(io::IO; topology=false)
+function importOFF(io::IO)
 
     local vts
     fcs = Face{Int}[] # faces might be triangulated, so we can't assume count
@@ -79,17 +79,5 @@ function importOFF(io::IO; topology=false)
         end
     end
 
-    if topology
-        uvts = unique(vts)
-        for i = 1:length(fcs)
-            #repoint indices to unique vertices
-            v1 = findfirst(uvts, vts[fcs[i].v1])
-            v2 = findfirst(uvts, vts[fcs[i].v2])
-            v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face{Int}(v1,v2,v3)
-        end
-        vts = uvts
-    end
-
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end

@@ -8,7 +8,7 @@ include("io/threejs.jl")
 
 export mesh
 
-function mesh(path::String; format=:autodetect, topology=false)
+function mesh(path::String; format=:autodetect)
     io = open(path, "r")
     fmt = format
     local msh
@@ -45,11 +45,11 @@ function mesh(path::String; format=:autodetect, topology=false)
         end
     end
     if fmt == :binarystl
-        msh = importBinarySTL(io, topology=topology, read_header=true)
+        msh = importBinarySTL(io, read_header=true)
     elseif fmt == :asciistl
-        msh = importAsciiSTL(io, topology=topology)
+        msh = importAsciiSTL(io)
     elseif fmt == :asciiply
-        msh = importAsciiPly(io, topology=topology)
+        msh = importAsciiPly(io)
     elseif fmt == :binaryply
         error("Reading binary .ply files not yet implemented")
     elseif fmt == :(2dm)

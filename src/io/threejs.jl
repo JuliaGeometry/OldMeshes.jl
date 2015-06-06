@@ -61,7 +61,7 @@ function writemime(io::IO, ::MIME"text/html", msh::Mesh)
     """)
 end
 
-function importThreejs( fn::String, topology=true )
+function importThreejs( fn::String)
 
     json = JSON.parsefile( fn )
 
@@ -143,7 +143,5 @@ function importThreejs( fn::String, topology=true )
 
     end
 
-    topology = false
-
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end

@@ -21,9 +21,10 @@ Supported file formats:
 
 Meshes can be imported with the following function.
 
-```mesh(path::String; format=:autodetect, topology=false)```
+```mesh(path::String; format=:autodetect)```
 
-By default the function autodetects the file format for you. You can specify a format manually by setting `format` to one of:
+By default the function autodetects the file format for you. You can specify a
+format manually by setting `format` to one of:
 * `:asciiply`
 * `:(2dm)`
 * `:obj`
@@ -33,7 +34,8 @@ By default the function autodetects the file format for you. You can specify a f
 * `:off`
 * `:threejs`
 
-By default we do not check topology for repeat vertices since it can be computationally expensive. If `topology` is set to `true`, repeat vertices are eliminated so the `Mesh` is a proper [face-vertex](https://en.wikipedia.org/wiki/Polygon_mesh#Face-vertex_meshes) polygon mesh.
+By default we do not check topology for repeat vertices since it can be
+computationally expensive. See:[face-vertex](https://en.wikipedia.org/wiki/Polygon_mesh#Face-vertex_meshes) polygon mesh.
 
 ### Export
 Support export formats:
