@@ -21,7 +21,7 @@ distance = distance + sigma*rand(2*N+1,2*N+1,2*N+1)
 lambda = N-2*sigma # isovalue
 
 tic()
-msh = isosurface(distance,lambda)
+msh = Mesh(distance,lambda)
 toc()
 
 # Simplify the mesh
@@ -67,7 +67,7 @@ function testUnionNotInterection()
     f(x,y,z) = min(f1(x,y,z), f2(x,y,z), f3(x,y,z))
 
     vol = volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
-    msh = isosurface(vol, 0.0)
+    msh = Mesh(vol, 0.0)
     exportStl(msh, export_path*"wiki_csg.stl")
     toc()
 end
@@ -82,7 +82,7 @@ function testCylinders()
     f(x,y,z) = min(c1(x,y,z), c2(x,y,z), c3(x,y,z))
 
     vol = volume(f, -3,-3,-3, 5,5,5, 2)
-    msh = isosurface(vol, 0.0)
+    msh = Mesh(vol, 0.0)
     exportStl(msh, export_path*"cylinders_test.stl")
     toc()
 end

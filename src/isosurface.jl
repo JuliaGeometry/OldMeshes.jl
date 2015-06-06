@@ -281,7 +281,7 @@ function isosurface(lsf, isoval, eps, indextype=Int, index_start=one(Int))
     fcAry = Face{indextype}[Face{indextype}(vtD[f.v1], vtD[f.v2], vtD[f.v3]) for f in fcs]
     vtAry = collect(values(vts))
 
-    Mesh(vtAry, fcAry)
+    (vtAry, fcAry)
 end
 
 isosurface(lsf,isoval) = isosurface(lsf,isoval, convert(eltype(lsf), 0.001))
@@ -290,6 +290,6 @@ isosurface(lsf,isoval) = isosurface(lsf,isoval, convert(eltype(lsf), 0.001))
 function call{MT <: Mesh, T}(::Type{MT}, volume::Array{T, 3}, iso_val::Real, eps_val=0.001)
     iso_val = convert(T, iso_val)
     eps_val = convert(T, eps_val)
-    vts, fcs = isosurface(volume, iso_val, eps_val, eltype(facetype(MT)))
+    vts, fcs = isosurface(volume, iso_val, eps_val)
     MT(vts, fcs)
 end
