@@ -1,6 +1,6 @@
 # http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format
 
-function importAMF(io::IO; topology=false)
+function importAMF(io::IO)
     str = readall(io)
     xml = parse_string(str)
     xml_root = root(xml)

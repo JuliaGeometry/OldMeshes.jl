@@ -6,7 +6,7 @@ export exportStl,
 import Base.writemime
 
 function exportStl(msh::Mesh, fn::String)
-  exportStl(msh, open(fn, "w"))
+    exportStl(msh, open(fn, "w"))
 end
 
 function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
@@ -44,7 +44,7 @@ function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
 end
 
 function exportBinaryStl(msh::Mesh, fn::String)
-  exportBinaryStl(msh, open(fn, "w"))
+    exportBinaryStl(msh, open(fn, "w"))
 end
 
 function exportBinaryStl(msh, str::IO, closeAfterwards::Bool=true)
@@ -77,18 +77,18 @@ function exportBinaryStl(msh, str::IO, closeAfterwards::Bool=true)
 end
 
 function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
-  exportSTL(msh, io)
+    exportSTL(msh, io)
 end
 
 
-function importBinarySTL(file::String; topology=false)
+function importBinarySTL(file::String)
     fn = open(file,"r")
-    mesh = importBinarySTL(fn, topology=topology)
+    mesh = importBinarySTL(fn)
     close(fn)
     return mesh
 end
 
-function importBinarySTL(file::IO; topology=false, read_header=false)
+function importBinarySTL(file::IO;read_header=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
@@ -110,32 +110,25 @@ function importBinarySTL(file::IO; topology=false, read_header=false)
         normal = binarySTLvertex(file)
         for i = 1:3
             vertex = binarySTLvertex(file)
-            if topology
-                idx = findfirst(vts, vertex)
-            end
-            if topology && idx != 0
-                vert_idx[i] = idx
-            else
-                push!(vts, vertex)
-                vert_count += 1
-                vert_idx[i] = vert_count
-            end
+            push!(vts, vertex)
+            vert_count += 1
+            vert_idx[i] = vert_count
         end
         skip(file, 2) # throwout 16bit attribute
         push!(fcs, Face{Int}(vert_idx...))
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end
 
-function importAsciiSTL(file::String; topology=false)
+function importAsciiSTL(file::String)
     fn = open(file,"r")
-    mesh = importAsciiSTL(fn, topology=topology)
+    mesh = importAsciiSTL(fn)
     close(fn)
     return mesh
 end
 
-function importAsciiSTL(file::IO; topology=false)
+function importAsciiSTL(file::IO)
     #ASCII STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
@@ -151,16 +144,9 @@ function importAsciiSTL(file::IO; topology=false)
             readline(file) # Throw away outerloop
             for i = 1:3
                 vertex = Vertex([parse(Float64, x) for x in split(readline(file))[2:4]]...)
-                if topology
-                    idx = findfirst(vts, vertex)
-                end
-                if topology && idx != 0
-                    vert_idx[i] = idx
-                else
-                    push!(vts, vertex)
-                    vert_count += 1
-                    vert_idx[i] = vert_count
-                end
+                push!(vts, vertex)
+                vert_count += 1
+                vert_idx[i] = vert_count
             end
             readline(file) # throwout endloop
             readline(file) # throwout endfacet
@@ -168,5 +154,5 @@ function importAsciiSTL(file::IO; topology=false)
         end
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end

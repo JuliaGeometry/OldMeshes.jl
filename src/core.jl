@@ -21,10 +21,7 @@ abstract AbstractMesh{V, F}
 type Mesh{V, F} <: AbstractMesh{V, F}
     vertices::Vector{V}
     faces::Vector{F}
-    has_topology::Bool
 end
-
-Mesh(v,f) = Mesh(v,f, true)
 
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
@@ -44,9 +41,8 @@ function Base.merge{V, F}(m1::AbstractMesh{V, F}, m2::AbstractMesh{V, F})
 end
 
 function Base.convert(::Type{Mesh{Vector3{Int},Face{Int}}}, mesh::Mesh{Vector3{Float64}, Face{Int}}, scale=1)
-    # assume loss of topology when converting to Ints
     Mesh{Vector3{Int},Face{Int}}(Vector3{Int}[Vector3{Int}(round(Int,v[1]*scale),
                                                            round(Int,v[2]*scale),
                                                            round(Int,v[3]*scale))
-                                                          for v in mesh.vertices], copy(mesh.faces), false)
+                                                          for v in mesh.vertices], copy(mesh.faces))
 end

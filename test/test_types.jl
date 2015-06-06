@@ -7,7 +7,7 @@ f2 = Face(1,2,3)
 @test f1.v3 == f2.v3
 
 let
-    m = mesh(data_path*"cube.stl", topology=false)
+    m = mesh(data_path*"cube.stl")
     c1 = convert(Mesh{Vector3{Int}, Face{Int}}, m)
     c2 = convert(Mesh{Vector3{Int}, Face{Int}}, m, 1000)
     @test length(m.faces) == length(c1.faces) == length(c2.faces)

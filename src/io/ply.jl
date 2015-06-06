@@ -67,15 +67,15 @@ function exportAsciiPly(msh::Mesh, fn::String)
 end
 
 
-function importAsciiPly(fn::String; topology=false)
+function importAsciiPly(fn::String)
     io = open(fn, "r")
-    mesh = importAsciiPly(io, topology=topology)
+    mesh = importAsciiPly(io)
     close(io)
     return mesh
 end
 
 
-function importAsciiPly(io::IO; topology=false)
+function importAsciiPly(io::IO)
     vts = Vertex[]
     fcs = Face{Int}[]
 
@@ -111,18 +111,6 @@ function importAsciiPly(io::IO; topology=false)
         end
     end
 
-    if topology
-        uvts = unique(vts)
-        for i = 1:length(fcs)
-            #repoint indices to unique vertices
-            v1 = findfirst(uvts, vts[fcs[i].v1])
-            v2 = findfirst(uvts, vts[fcs[i].v2])
-            v3 = findfirst(uvts, vts[fcs[i].v3])
-            fcs[i] = Face{Int}(v1,v2,v3)
-        end
-        vts = uvts
-    end
-
-    return Mesh{Vertex, Face{Int}}(vts, fcs, topology)
+    return Mesh{Vertex, Face{Int}}(vts, fcs)
 end
 
