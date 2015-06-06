@@ -34,9 +34,9 @@ export isosurface
 # X
 
 immutable VoxelIndexes{T <: Integer}
-    voxCrnrPos::Vector{Vector3{T}}
-    voxEdgeCrnrs::Vector{Vector2{T}}
-    voxEdgeDir::Vector{T}
+    voxCrnrPos::NTuple{8,Vector3{T}}
+    voxEdgeCrnrs::NTuple{19, Vector2{T}}
+    voxEdgeDir::NTuple{19,T}
     voxEdgeIx::Matrix{T}
     subTets::Matrix{T}
     subTets::Matrix{T}
@@ -46,41 +46,39 @@ immutable VoxelIndexes{T <: Integer}
     function VoxelIndexes()
         VT3 = Vector3{T}
         VT2 = Vector2{T}
-        voxCrnrPos = VT3[
-                        VT3(0, 0, 0),
-                        VT3(0, 1, 0),
-                        VT3(1, 1, 0),
-                        VT3(1, 0, 0),
-                        VT3(0, 0, 1),
-                        VT3(0, 1, 1),
-                        VT3(1, 1, 1),
-                        VT3(1, 0, 1)]
+        voxCrnrPos = (VT3(0, 0, 0),
+                      VT3(0, 1, 0),
+                      VT3(1, 1, 0),
+                      VT3(1, 0, 0),
+                      VT3(0, 0, 1),
+                      VT3(0, 1, 1),
+                      VT3(1, 1, 1),
+                      VT3(1, 0, 1))
         # the voxel IDs at either end of the tetrahedra edges, by edge ID
-        voxEdgeCrnrs = VT2[
-                            VT2(1, 2),
-                            VT2(2, 3),
-                            VT2(4, 3),
-                            VT2(1, 4),
-                            VT2(5, 6),
-                            VT2(6, 7),
-                            VT2(8, 7),
-                            VT2(5, 8),
-                            VT2(1, 5),
-                            VT2(2, 6),
-                            VT2(3, 7),
-                            VT2(4, 8),
-                            VT2(1, 3),
-                            VT2(1, 8),
-                            VT2(1, 6),
-                            VT2(5, 7),
-                            VT2(2, 7),
-                            VT2(4, 7),
-                            VT2(1, 7)]
+        voxEdgeCrnrs = (VT2(1, 2),
+                        VT2(2, 3),
+                        VT2(4, 3),
+                        VT2(1, 4),
+                        VT2(5, 6),
+                        VT2(6, 7),
+                        VT2(8, 7),
+                        VT2(5, 8),
+                        VT2(1, 5),
+                        VT2(2, 6),
+                        VT2(3, 7),
+                        VT2(4, 8),
+                        VT2(1, 3),
+                        VT2(1, 8),
+                        VT2(1, 6),
+                        VT2(5, 7),
+                        VT2(2, 7),
+                        VT2(4, 7),
+                        VT2(1, 7))
 
         # direction codes:
         # 0 => +x, 1 => +y, 2 => +z,
         # 3 => +xy, 4 => +xz, 5 => +yz, 6 => +xyz
-        voxEdgeDir = T[1,0,1,0,1,0,1,0,2,2,2,2,3,4,5,3,4,5,6]
+        voxEdgeDir = convert(NTuple{19,T}, (1,0,1,0,1,0,1,0,2,2,2,2,3,4,5,3,4,5,6))
 
         # For a pair of corner IDs, the edge ID joining them
         # 0 denotes a pair with no edge
@@ -126,15 +124,14 @@ immutable VoxelIndexes{T <: Integer}
                     1 4 3 0 0 0;
                     0 0 0 0 0 0]'
 
-        new(
-          voxCrnrPos,
-          voxEdgeCrnrs,
-          voxEdgeDir,
-          voxEdgeIx,
-          subTets,
-          subTets,
-          tetEdgeCrnrs,
-          tetTri)
+        new(voxCrnrPos,
+            voxEdgeCrnrs,
+            voxEdgeDir,
+            voxEdgeIx,
+            subTets,
+            subTets,
+            tetEdgeCrnrs,
+            tetTri)
     end
 end
 # (X,Y,Z)-coordinates for each voxel corner ID
@@ -260,7 +257,7 @@ function marchingTetrahedra{T<:Real, IT <: Integer}(lsf::AbstractArray{T,3}, iso
     vals = zeros(T, 8)
     @inbounds for k::indextype = 1:nz-1, j::indextype = 1:ny-1, i::indextype = 1:nx-1
         for l::indextype=1:8
-          vals[l] = lsf[i+vxidx.voxCrnrPos[l][1], j+vxidx.voxCrnrPos[l][2], k+vxidx.voxCrnrPos[l][3]]
+            vals[l] = lsf[i+vxidx.voxCrnrPos[l][1], j+vxidx.voxCrnrPos[l][2], k+vxidx.voxCrnrPos[l][3]]
         end
         if hasFaces(vals,iso)
             procVox(vals, iso, i, j, k, nx, ny, vts, fcs, eps, vxidx)
