@@ -5,13 +5,13 @@ using Compat
 using LightXML
 using ZipFile
 
-include("io/2dm.jl")
-include("io/amf.jl")
-include("io/obj.jl")
-include("io/off.jl")
-include("io/ply.jl")
-include("io/stl.jl")
-include("io/threejs.jl")
+include("files/2dm.jl")
+include("files/amf.jl")
+include("files/obj.jl")
+include("files/off.jl")
+include("files/ply.jl")
+include("files/stl.jl")
+include("files/threejs.jl")
 
 export mesh
 
