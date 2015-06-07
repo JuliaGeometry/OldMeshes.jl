@@ -53,7 +53,7 @@ off1 = mesh(data_path*"cube.off") # quads
 io = IOBuffer()
 exportBinaryStl(binary_stl1, io, false)
 seekstart(io)
-binary_stl1_rewritten = Meshes.importBinarySTL(io)
+binary_stl1_rewritten = importBinarySTL(io)
 for i=1:length(binary_stl1_rewritten.vertices)
     binary_stl1_rewritten.vertices[i]==binary_stl1.vertices[i]
 end

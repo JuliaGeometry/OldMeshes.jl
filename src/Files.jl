@@ -1,3 +1,10 @@
+module Files
+
+using Meshes
+using Compat
+using LightXML
+using ZipFile
+
 include("io/2dm.jl")
 include("io/amf.jl")
 include("io/obj.jl")
@@ -77,3 +84,5 @@ function mesh(path::String; format=:autodetect)
     close(io)
     return msh
 end
+
+end #module

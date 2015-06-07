@@ -2,11 +2,9 @@ module Meshes
 
 using Compat
 using ImmutableArrays
-using LightXML
-using ZipFile
 
 include("core.jl")
-include("io.jl")
+include("Files.jl")
 include("isosurface.jl")
 include("csg.jl")
 include("slice.jl")

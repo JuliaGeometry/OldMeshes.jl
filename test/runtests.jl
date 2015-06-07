@@ -1,5 +1,6 @@
 using Base.Test
 using Meshes
+using Meshes.Files
 using ImmutableArrays
 
 include("test_types.jl")
