@@ -9,6 +9,10 @@ Generation and manipulation of triangular [polygon meshes](https://en.wikipedia.
 1. Isosurface extraction via [marching tetrahedra](https://en.wikipedia.org/wiki/Marching_tetrahedra).
 2. Construction of volumes from primitive solids (sphere, box, cylinder).
 
+## Files
+
+Import and export features can be accessed by `using`/`import`ing `Meshes.Files`.
+
 ### Import
 Supported file formats:
 * [Binary and ASCII STL](https://en.wikipedia.org/wiki/STL_%28file_format%29)
