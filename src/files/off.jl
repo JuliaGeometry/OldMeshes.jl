@@ -44,7 +44,7 @@ end
 function importOFF(io::IO)
 
     local vts
-    fcs = Face{Int}[] # faces might be triangulated, so we can't assume count
+    fcs = Face3{Int,0}[] # faces might be triangulated, so we can't assume count
     nV = 0
     nF = 0
 
@@ -59,14 +59,14 @@ function importOFF(io::IO)
             vert = Float64[@compat parse(Float64, s) for s in split(txt)]
             if length(vert) == 3
                 read_verts += 1
-                vts[read_verts] = Vertex(vert...)
+                vts[read_verts] = Point3{Float64}(vert...)
             end
             continue
         elseif found_counts # read faces
             face = Int[@compat parse(Int, s) for s in split(txt)]
             if length(face) >= 4
                 for i = 4:length(face) #triangulate
-                    push!(fcs, Face{Int}(face[2]+1, face[i-1]+1, face[i]+1))
+                    push!(fcs, Face3{Int,0}(face[2]+1, face[i-1]+1, face[i]+1))
                 end
             end
             continue
@@ -74,10 +74,10 @@ function importOFF(io::IO)
             counts = Int[@compat parse(Int, s) for s in split(txt)]
             nV = counts[1]
             nF = counts[2]
-            vts = Array(Vertex, nV)
+            vts = Array(Point3{Float64}, nV)
             found_counts = true
         end
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
 end

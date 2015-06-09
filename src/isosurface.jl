@@ -222,7 +222,7 @@ end
 function procVox{T<:Real, IType <: Integer}(vals::Vector{T}, iso::T,
                           x::IType, y::IType, z::IType,
                           nx::IType, ny::IType,
-                          vts::Dict{IType, Vector3{T}}, fcs::Vector{Face{IType}},
+                          vts::Dict{IType, Vector3{T}}, fcs::Vector{Face3{IType,0}},
                           eps::T, vxidx::VoxelIndices{IType})
 
     # check each sub-tetrahedron in the voxel
@@ -236,7 +236,7 @@ function procVox{T<:Real, IType <: Integer}(vals::Vector{T}, iso::T,
             e3 = vxidx.tetTri[j+2,tIx]
 
             # add the face to the list
-            push!(fcs, Face{IType}(
+            push!(fcs, Face3{IType,0}(
                       getVertId(voxEdgeId(i, e1, vxidx), x, y, z, nx, ny, vals, iso, vts, eps, vxidx),
                       getVertId(voxEdgeId(i, e2, vxidx), x, y, z, nx, ny, vals, iso, vts, eps, vxidx),
                       getVertId(voxEdgeId(i, e3, vxidx), x, y, z, nx, ny, vals, iso, vts, eps, vxidx)))
@@ -248,7 +248,7 @@ end
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real, IT <: Integer}(lsf::AbstractArray{T,3}, iso::T, eps::T, indextype::Type{IT})
     vts        = Dict{indextype, Vector3{T}}()
-    fcs        = Array(Face{indextype}, 0)
+    fcs        = Array(Face3{indextype,0}, 0)
     sizehint!(vts, div(length(lsf),8))
     sizehint!(fcs, div(length(lsf),4))
     const vxidx = VoxelIndices{indextype}()
@@ -278,7 +278,7 @@ function isosurface(lsf, isoval, eps, indextype=Int, index_start=one(Int))
         vtD[x] = k
         k += one(indextype)
     end
-    fcAry = Face{indextype}[Face{indextype}(vtD[f.v1], vtD[f.v2], vtD[f.v3]) for f in fcs]
+    fcAry = Face3{indextype, index_start-1}[Face3{indextype, index_start-1}(vtD[f[1]], vtD[f[2]], vtD[f[3]]) for f in fcs]
     vtAry = collect(values(vts))
 
     (vtAry, fcAry)
