@@ -47,19 +47,16 @@ Support export formats:
 
 ## Roadmap
 
-### [0.1.0](https://github.com/JuliaGeometry/Meshes.jl/milestones/v0.1.0)
-
-1. [Slicing](https://github.com/JuliaGeometry/Meshes.jl/pull/34) (3D -> 2D plane)
-
 ### [0.2.0](https://github.com/JuliaGeometry/Meshes.jl/milestones/v0.2.0)
 
 1. Merge improvements in [Meshes2](https://github.com/JuliaGeometry/Meshes2.jl)
 2. First release requiring Julia 0.4
+3. Update `Meshes.Files` to work better with FileIO API
 
 ### Future
 
-1. Basic mesh simplification.
-2. [Mesh repair.](https://github.com/JuliaGeometry/Meshes.jl/issues/33)
+1. Basic mesh simplification
+2. [Mesh repair](https://github.com/JuliaGeometry/Meshes.jl/issues/33)
 
 ## License
 This package is available under the MIT "Expat" License. See [LICENSE.md](./LICENSE.md).
