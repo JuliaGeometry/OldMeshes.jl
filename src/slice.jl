@@ -1,13 +1,13 @@
 # TODO Return type channges based on pair value
-function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
+function Base.slice(mesh::Mesh{Point3{Float64}, Face3{Int,0}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
-    slices = [@compat Tuple{Vector2{Float64}, Vector2{Float64}}[] for i = 1:height_ct]
+    slices = [@compat Tuple{Point2{Float64}, Point2{Float64}}[] for i = 1:height_ct]
 
     for face in mesh.faces
-        v1 = mesh.vertices[face.v1]
-        v2 = mesh.vertices[face.v2]
-        v3 = mesh.vertices[face.v3]
+        v1 = mesh.vertices[face[1]]
+        v2 = mesh.vertices[face[2]]
+        v3 = mesh.vertices[face[3]]
         zmax = max(v1[3], v2[3], v3[3])
         zmin = min(v1[3], v2[3], v3[3])
         for i = 1:height_ct
@@ -43,9 +43,9 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
                     continue
                 end
 
-                start = Vector2{Float64}(p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3]),
+                start = Point2{Float64}(p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3]),
                 p1[2] + (p2[2] - p1[2]) * (height - p1[3]) / (p2[3] - p1[3]))
-                finish = Vector2{Float64}(p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3]),
+                finish = Point2{Float64}(p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3]),
                 p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3]))
 
                 push!(slices[i], (start, finish))
@@ -57,7 +57,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         return slices
     end
 
-    paired_slices = [Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[] for i = 1:height_ct]
+    paired_slices = [Vector{@compat Tuple{Point2{Float64}, Point2{Float64}}}[] for i = 1:height_ct]
 
     for slice_num = 1:height_ct
         lines = slices[slice_num]
@@ -65,7 +65,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         if line_ct == 0
             continue
         end
-        polys = Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[]
+        polys = Vector{@compat Tuple{Point2{Float64}, Point2{Float64}}}[]
         paired = falses(line_ct)
         start = 1
         seg = 1
@@ -79,7 +79,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
 
         while true
             #Start new polygon with seg
-            poly = @compat Tuple{Vector2{Float64}, Vector2{Float64}}[]
+            poly = @compat Tuple{Point2{Float64}, Point2{Float64}}[]
             push!(poly, lines[seg])
 
             #Pair slice until we get to start point
@@ -145,15 +145,15 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
 end
 
 
-function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Vector{Int})
+function Base.slice(mesh::Mesh{Point3{Int}, Face3{Int,0}}, heights::Vector{Int})
 
     height_ct = length(heights)
-    slices = Vector{@compat Tuple{Vector2{Int}, Vector2{Int}}}[@compat Tuple{Vector2{Int}, Vector2{Int}}[] for i = 1:height_ct]
+    slices = Vector{@compat Tuple{Point2{Int}, Point2{Int}}}[@compat Tuple{Point2{Int}, Point2{Int}}[] for i = 1:height_ct]
 
     for face in mesh.faces
-        v1 = mesh.vertices[face.v1]
-        v2 = mesh.vertices[face.v2]
-        v3 = mesh.vertices[face.v3]
+        v1 = mesh.vertices[face[1]]
+        v2 = mesh.vertices[face[2]]
+        v3 = mesh.vertices[face[3]]
         zmax = max(v1[3], v2[3], v3[3])
         zmin = min(v1[3], v2[3], v3[3])
         for i = 1:height_ct
@@ -189,9 +189,9 @@ function Base.slice(mesh::Mesh{Vector3{Int}, Face{Int}}, heights::Vector{Int})
                     continue
                 end
 
-                start = Vector2{Int}(round(Int, p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3])),
+                start = Point2{Int}(round(Int, p1[1] + (p2[1] - p1[1]) * (height - p1[3]) / (p2[3] - p1[3])),
                                      round(Int, p1[2] + (p2[2] - p1[2]) * (height - p1[3]) / (p2[3] - p1[3])))
-                finish = Vector2{Int}(round(Int, p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3])),
+                finish = Point2{Int}(round(Int, p1[1] + (p3[1] - p1[1]) * (height - p1[3]) / (p3[3] - p1[3])),
                                       round(Int, p1[2] + (p3[2] - p1[2]) * (height - p1[3]) / (p3[3] - p1[3])))
 
                 push!(slices[i], (start, finish))

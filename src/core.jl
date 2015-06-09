@@ -1,20 +1,9 @@
-export Vertex,
-       Face,
-       AbstractMesh,
+export AbstractMesh,
        Mesh,
        vertices,
        faces
 
-typealias Vertex Vector3{Float64}
-
-immutable Face{T}
-    v1::T
-    v2::T
-    v3::T
-end
-
-Face{T}(v::AbstractArray{T}) = Face{T}(v[1], v[2], v[3])
-
+typealias Vertex Point3{Float64}
 
 abstract AbstractMesh{V, F}
 
@@ -36,12 +25,12 @@ function Base.merge{V, F}(m1::AbstractMesh{V, F}, m2::AbstractMesh{V, F})
     f2 = faces(m2)
     nV = size(v1,1)
     nF = size(f2,1)
-    newF2 = F[ F(f2[i].v1+nV, f2[i].v2+nV, f2[i].v3+nV) for i = 1:nF ]
+    newF2 = F[ F(f2[i][1]+nV, f2[i][2]+nV, f2[i][3]+nV) for i = 1:nF ]
     Mesh(append!(v1,v2),append!(f1,newF2))
 end
 
-function Base.convert(::Type{Mesh{Vector3{Int},Face{Int}}}, mesh::Mesh{Vector3{Float64}, Face{Int}}, scale=1)
-    Mesh{Vector3{Int},Face{Int}}(Vector3{Int}[Vector3{Int}(round(Int,v[1]*scale),
+function Base.convert(::Type{Mesh{Point3{Int},Face3{Int,0}}}, mesh::Mesh{Point3{Float64}, Face3{Int,0}}, scale=1)
+    Mesh{Point3{Int},Face3{Int,0}}(Point3{Int}[Point3{Int}(round(Int,v[1]*scale),
                                                            round(Int,v[2]*scale),
                                                            round(Int,v[3]*scale))
                                                           for v in mesh.vertices], copy(mesh.faces))

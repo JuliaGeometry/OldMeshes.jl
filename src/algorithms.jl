@@ -4,9 +4,9 @@ function Base.unique{V, F}(m::Mesh{V,F})
     uvts = unique(vts)
     for i = 1:length(fcs)
         #repoint indices to unique vertices
-        v1 = findfirst(uvts, vts[fcs[i].v1])
-        v2 = findfirst(uvts, vts[fcs[i].v2])
-        v3 = findfirst(uvts, vts[fcs[i].v3])
+        v1 = findfirst(uvts, vts[fcs[i][1]])
+        v2 = findfirst(uvts, vts[fcs[i][2]])
+        v3 = findfirst(uvts, vts[fcs[i][3]])
         fcs[i] = F(v1,v2,v3)
     end
     Mesh{V,F}(uvts,fcs)
