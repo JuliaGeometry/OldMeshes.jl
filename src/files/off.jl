@@ -56,14 +56,14 @@ function importOFF(io::IO)
         if startswith(txt, "#") #comment
             continue
         elseif found_counts && read_verts < nV # read verts
-            vert = map(float64, split(txt))
+            vert = Float64[@compat parse(Float64, s) for s in split(txt)]
             if length(vert) == 3
                 read_verts += 1
                 vts[read_verts] = Vertex(vert...)
             end
             continue
         elseif found_counts # read faces
-            face = map(int, split(txt))
+            face = Int[@compat parse(Int, s) for s in split(txt)]
             if length(face) >= 4
                 for i = 4:length(face) #triangulate
                     push!(fcs, Face{Int}(face[2]+1, face[i-1]+1, face[i]+1))
@@ -71,7 +71,7 @@ function importOFF(io::IO)
             end
             continue
         elseif !found_counts && isdigit(split(txt)[1]) # vertex and face counts
-            counts = map(int, split(txt))
+            counts = Int[@compat parse(Int, s) for s in split(txt)]
             nV = counts[1]
             nF = counts[2]
             vts = Array(Vertex, nV)
