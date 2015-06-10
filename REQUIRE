@@ -1,5 +1,6 @@
-julia 0.3-
-ImmutableArrays
+julia 0.4-
+GeometryTypes
+FixedSizeArrays
 DataStructures
 ZipFile
 LightXML

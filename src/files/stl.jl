@@ -24,13 +24,13 @@ function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
         n = [0,0,0] # TODO: properly compute normal(f)
         @printf str "  facet normal %e %e %e\n" n[1] n[2] n[3]
         write(str,"    outer loop\n")
-        v = vts[f.v1]
+        v = vts[f[1]]
         @printf str "      vertex  %e %e %e\n" v[1] v[2] v[3]
 
-        v = vts[f.v2]
+        v = vts[f[2]]
         @printf str "      vertex  %e %e %e\n" v[1] v[2] v[3]
 
-        v = vts[f.v3]
+        v = vts[f[3]]
         @printf str "      vertex  %e %e %e\n" v[1] v[2] v[3]
 
         write(str,"    endloop\n")
@@ -63,7 +63,7 @@ function exportBinaryStl(msh, str::IO, closeAfterwards::Bool=true)
         n = Float32[0,0,0] # TODO: properly compute normal(f)
         for i=1:3; write(str, n[i]); end # write normal
 
-        for v in [f.v1, f.v2, f.v3]
+        for v in [f[1], f[2], f[3]]
             for j = 1:3
                 write(str, @compat Float32(vts[v][j])) # write vertex coordinates
             end
@@ -92,12 +92,12 @@ function importBinarySTL(file::IO;read_header=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
-    binarySTLvertex(file) = Vertex((@compat Float64(read(file, Float32))),
+    binarySTLvertex(file) = Point3{Float64}((@compat Float64(read(file, Float32))),
                                    (@compat Float64(read(file, Float32))),
                                    (@compat Float64(read(file, Float32))))
 
-    vts = Vertex[]
-    fcs = Face{Int}[]
+    vts = Point3{Float64}[]
+    fcs = Face3{Int,0}[]
 
     if !read_header
         readbytes(file, 80) # throw out header
@@ -115,10 +115,10 @@ function importBinarySTL(file::IO;read_header=false)
             vert_idx[i] = vert_count
         end
         skip(file, 2) # throwout 16bit attribute
-        push!(fcs, Face{Int}(vert_idx...))
+        push!(fcs, Face3{Int,0}(vert_idx...))
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
 end
 
 function importAsciiSTL(file::String)
@@ -132,27 +132,27 @@ function importAsciiSTL(file::IO)
     #ASCII STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
-    vts = Vertex[]
-    fcs = Face{Int}[]
+    vts = Point3{Float64}[]
+    fcs = Face3{Int,0}[]
 
     vert_count = 0
     vert_idx = [0,0,0]
     while !eof(file)
         line = split(lowercase(readline(file)))
         if !isempty(line) && line[1] == "facet"
-            normal = Vertex([parse(Float64, x) for x in line[3:5]]...)
+            normal = Point3{Float64}([parse(Float64, x) for x in line[3:5]]...)
             readline(file) # Throw away outerloop
             for i = 1:3
-                vertex = Vertex([parse(Float64, x) for x in split(readline(file))[2:4]]...)
+                vertex = Point3{Float64}([parse(Float64, x) for x in split(readline(file))[2:4]]...)
                 push!(vts, vertex)
                 vert_count += 1
                 vert_idx[i] = vert_count
             end
             readline(file) # throwout endloop
             readline(file) # throwout endfacet
-            push!(fcs, Face{Int}(vert_idx...))
+            push!(fcs, Face3{Int,0}(vert_idx...))
         end
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
 end

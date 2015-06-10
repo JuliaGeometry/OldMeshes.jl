@@ -77,13 +77,13 @@ function importThreejs( fn::String)
 
     end
 
-    vts = Vertex[]
+    vts = Point3{Float64}[]
     fcs = Face{Int}[]
 
     nV = length(json["vertices"])
 
     for i=1:3:nV
-        push!(vts, Vertex(json["vertices"][i], json["vertices"][i+1], json["vertices"][i+2]))
+        push!(vts, Point3{Float64}(json["vertices"][i], json["vertices"][i+1], json["vertices"][i+2]))
     end
 
     i = 1
@@ -143,5 +143,5 @@ function importThreejs( fn::String)
 
     end
 
-    return Mesh{Vertex, Face{Int}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face{Int}}(vts, fcs)
 end

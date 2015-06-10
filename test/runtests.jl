@@ -1,7 +1,7 @@
 using Base.Test
 using Meshes
 using Meshes.Files
-using ImmutableArrays
+using GeometryTypes
 
 include("test_types.jl")
 include("test_meshes.jl")
