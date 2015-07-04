@@ -1,3 +1,7 @@
+function Base.(:(==))(a::Vector2, b::Vector2)
+    return a[1] == b[1] && a[2] == b[2]
+end
+
 # TODO Return type channges based on pair value
 function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
@@ -77,7 +81,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
             end
         end
 
-        while true
+        @inbounds while true
             #Start new polygon with seg
             poly = @compat Tuple{Vector2{Float64}, Vector2{Float64}}[]
             push!(poly, lines[seg])
