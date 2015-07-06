@@ -4,7 +4,6 @@ using Meshes
 using Compat
 using LightXML
 using ZipFile
-using GeometryTypes
 
 include("files/2dm.jl")
 include("files/amf.jl")

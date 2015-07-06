@@ -1,7 +1,7 @@
 module Meshes
 
 using Compat
-using GeometryTypes
+using ImmutableArrays
 
 include("core.jl")
 include("Files.jl")

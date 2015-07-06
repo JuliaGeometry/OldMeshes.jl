@@ -1,7 +1,33 @@
-export AbstractMesh,
+export Vertex,
+       Face,
+       AbstractMesh,
        Mesh,
        vertices,
-       faces
+       faces,
+       Face3,
+       Point2,
+       Point3
+
+
+typealias Vertex Vector3{Float64}
+
+immutable Face3{T, Id}
+    v1::T
+    v2::T
+    v3::T
+end
+
+Face3{T}(v::AbstractArray{T}) = Face3{T,1}(v[1], v[2], v[3])
+Face3{T}(x::T,y::T,z::T) = Face3{T,1}(x,y,z)
+
+@inline function Base.getindex(f::Face3, i)
+    i == 1 ? f.v1 : i == 2 ? f.v2 : f.v3
+end
+
+
+typealias Point3 Vector3
+
+typealias Point2 Vector2
 
 typealias Vertex Point3{Float64}
 
