@@ -1,6 +1,4 @@
-export isosurface
-
-
+typealias Vertex Point3
 #
 # *** Marching Tetrahedra ***
 #
@@ -267,7 +265,7 @@ function marchingTetrahedra{T<:Real, IT <: Integer}(lsf::AbstractArray{T,3}, iso
     (vts,fcs)
 end
 
-function isosurface(lsf, isoval, eps, indextype=Int, index_start=one(Int))
+function isosurface(lsf, isoval, eps, indextype=Cuint, index_start=zero(Int))
     # get marching tetrahedra version of the mesh
     (vts, fcs) = marchingTetrahedra(lsf, isoval, eps, indextype)
     # normalize the mesh representation
@@ -300,4 +298,3 @@ function Mesh{T}(volume::Array{T,3}, iso_val::Real, eps_val=0.001)
     vts, fcs = isosurface(volume, iso_val, eps_val)
     Mesh(vts, fcs)
 end
-
