@@ -8,6 +8,9 @@ export Vertex,
        Point2,
        Point3
 
+
+typealias Vertex ImmutableArrays.Vector3{Float64}
+
 immutable Face3{T, Id}
     v1::T
     v2::T
@@ -22,11 +25,14 @@ Face3{T}(x::T,y::T,z::T) = Face3{T,1}(x,y,z)
 end
 
 
-typealias Point3 Vector3
+typealias Point3 ImmutableArrays.Vector3
 
-typealias Point2 Vector2
+typealias Point2 ImmutableArrays.Vector2
 
 typealias Vertex Point3{Float64}
+
+abstract AbstractMesh{V, F}
+
 
 type Mesh{V, F} <: AbstractMesh{V, F}
     vertices::Vector{V}
@@ -36,6 +42,7 @@ end
 vertices(m::Mesh) = m.vertices
 faces(m::Mesh) = m.faces
 
+Base.isempty(m::Mesh) = isempty(m.vertices) && isempty(m.faces)
 
 # all vectors must have the same length, besides the face vector or empty vector
 # Type can be void or a value, this way we can create many combinations from this one mesh type.
@@ -57,32 +64,32 @@ facetype{_1, FaceT, _2, _3, _4, _5, _6}(::Type{HomogenousMesh{_1, FaceT, _2, _3,
 typealias HMesh HomogenousMesh
 
 typealias PlainMesh{VT, FT}  HMesh{Point3{VT}, Triangle{FT}, Void, Void,  Void, Void, Void}
-typealias GLPlainMesh PlainMesh{Float32, Cuint} 
+typealias GLPlainMesh PlainMesh{Float32, Cuint}
 
 typealias Mesh2D{VT, FT}  HMesh{Point2{VT}, Triangle{FT}, Void, Void,  Void, Void, Void}
-typealias GLMesh2D Mesh2D{Float32, Cuint} 
+typealias GLMesh2D Mesh2D{Float32, Cuint}
 
 typealias UVMesh{VT, FT, UVT}  HMesh{Point3{VT}, Triangle{FT}, Void, UV{UVT},  Void, Void, Void}
-typealias GLUVMesh UVMesh{Float32, Cuint, Float32} 
+typealias GLUVMesh UVMesh{Float32, Cuint, Float32}
 
 typealias UVWMesh{VT, FT, UVT} HMesh{Point3{VT}, Triangle{FT}, Void, UVW{UVT}, Void, Void, Void}
-typealias GLUVWMesh UVWMesh{Float32, Cuint, Float32} 
+typealias GLUVWMesh UVWMesh{Float32, Cuint, Float32}
 
 typealias NormalMesh{VT, FT, NT}  HMesh{Point3{VT}, Triangle{FT}, Normal3{NT}, Void,  Void, Void, Void}
-typealias GLNormalMesh NormalMesh{Float32, Cuint, Float32} 
+typealias GLNormalMesh NormalMesh{Float32, Cuint, Float32}
 
 typealias UVMesh2D{VT, FT, UVT}  HMesh{Point2{VT}, Triangle{FT}, Void, UV{UVT},  Void, Void, Void}
-typealias GLUVMesh2D UVMesh2D{Float32, Cuint, Float32} 
+typealias GLUVMesh2D UVMesh2D{Float32, Cuint, Float32}
 
 typealias NormalColorMesh{VT, FT, NT, CT}  HMesh{Point3{VT}, Triangle{FT}, Normal3{NT}, Void,  CT, Void, Void}
-typealias GLNormalColorMesh NormalColorMesh{Float32, Cuint, Float32, RGBA{Float32}} 
+typealias GLNormalColorMesh NormalColorMesh{Float32, Cuint, Float32, RGBA{Float32}}
 
 typealias NormalAttributeMesh{VT, FT, NT, AT, A_ID_T} HMesh{Point3{VT}, Triangle{FT}, Normal3{NT}, Void,  Void, AT, A_ID_T}
-typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, Cuint, Float32, Vector{RGBAU8}, Float32} 
+typealias GLNormalAttributeMesh NormalAttributeMesh{Float32, Cuint, Float32, Vector{RGBAU8}, Float32}
 # Needed to not get into an stack overflow
 convert{HM1 <: HMesh}(::Type{HM1}, mesh::HM1) = mesh
 
-# Uses getindex to get all the converted attributes from the meshtype and 
+# Uses getindex to get all the converted attributes from the meshtype and
 # creates a new mesh with the desired attributes from the converted attributs
 # Getindex can be defined for any arbitrary geometric type or exotic mesh type.
 # This way, we can make sure, that you can convert most of the meshes from one type to the other
@@ -171,6 +178,7 @@ function Base.convert(::Type{Mesh{Point3{Int},Face3{Int,0}}}, mesh::Mesh{Point3{
                                                            round(Int,v[2]*scale),
                                                            round(Int,v[3]*scale))
                                                           for v in mesh.vertices], copy(mesh.faces))
+end
 
 # Bad, bad name! But it's a little tricky to filter out faces and verts from the attributes, after get_attribute
 attributes_noVF(m::Mesh) = filter((key,val) -> (val != nothing && val != Void[]), Dict{Symbol, Any}(map(field->(field => m.(field)), fieldnames(typeof(m))[3:end])))

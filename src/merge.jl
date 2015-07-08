@@ -4,7 +4,7 @@ merge{M <: Mesh}(m::Vector{M}) = merge(tuple(m...))
 
 #Merges an arbitrary mesh. This function probably doesn't work for all types of meshes
 function merge{N, M <: Mesh}(meshes::NTuple{N, M})
-	m1 = first(meshes)
+    m1 = first(meshes)
     v = m1.vertices
     f = m1.faces
     attribs = attributes_noVF(m1)
@@ -13,8 +13,8 @@ function merge{N, M <: Mesh}(meshes::NTuple{N, M})
         append!(v, mesh.vertices)
        	map(append!, values(attribs), values(attributes_noVF(mesh)))
     end
-    attribs[:vertices] 	= v
-    attribs[:faces] 	= f
+    attribs[:vertices] = v
+    attribs[:faces] = f
     return M(attribs)
 end
 
