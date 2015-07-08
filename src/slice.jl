@@ -1,4 +1,4 @@
-function Base.(:(==))(a::Vector2, b::Vector2)
+function Base.(:(==))(a::Point2, b::Point2)
     return a[1] == b[1] && a[2] == b[2]
 end
 

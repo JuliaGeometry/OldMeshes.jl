@@ -13,14 +13,14 @@ function Base.unique{V, F}(m::Mesh{V,F})
 end
 
 immutable MeshMulFunctor{T} <: Base.Func{2}
-    matrix::Matrix4x4{T}
+    matrix::ImmutableArrays.Matrix4x4{T}
 end
 
 function call{T}(m::MeshMulFunctor{T}, vert)
-    Vector3{T}(m.matrix*Vector4{T}(vert..., 1))
+    Vector3{T}(m.matrix*ImmutableArrays.Vector4{T}(vert..., 1))
 end
 
-function (*){T}(m::Matrix4x4{T}, mesh::Mesh)
+function (*){T}(m::ImmutableArrays.Matrix4x4{T}, mesh::Mesh)
     msh = deepcopy(mesh)
     map!(MeshMulFunctor(m), msh.vertices)
     msh
