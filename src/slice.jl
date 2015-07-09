@@ -66,7 +66,7 @@ function Base.slice(mesh::Mesh{Point3{Float64}, Face3{Int,0}}, heights::Vector{F
             continue
         end
         polys = Vector{@compat Tuple{Point2{Float64}, Point2{Float64}}}[]
-        paired = falses(line_ct)
+        paired = fill(false, line_ct)
         start = 1
         seg = 1
         paired[seg] = true
