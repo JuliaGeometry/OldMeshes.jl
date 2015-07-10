@@ -66,7 +66,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
             continue
         end
         polys = Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[]
-        paired = falses(line_ct)
+        paired = fill(false, line_ct)
         start = 1
         seg = 1
         paired[seg] = true
@@ -77,7 +77,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
             end
         end
 
-        while true
+        @inbounds while true
             #Start new polygon with seg
             poly = @compat Tuple{Vector2{Float64}, Vector2{Float64}}[]
             push!(poly, lines[seg])
