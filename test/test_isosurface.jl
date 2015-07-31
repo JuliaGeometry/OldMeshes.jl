@@ -9,18 +9,14 @@ function test()
   max     = maximum(volume2)
   min     = minimum(volume2)
   volume2  = (volume2 .- min) ./ (max .- min)
-  @time msh     = GLNormalMesh(volume2, 0.5f0)
-  println(msh)
+  @time msh = GLNormalMesh(volume2, 0.5f0)
   @time vtx = isosurface(volume2, 0.5f0, 0.001f0)
-  for elem in vtx 
-    println(size(elem))
-  end
+
 end
 
-
-@show GLUVWMesh(Cube(Vector3(0f0), Vector3(1f0)))
-@show GLUVMesh2D(Rectangle{Float32}(0f0,0f0,10f0, 10f0))
-@show GLNormalMesh(Cube(Vector3(0f0), Vector3(1f0)))
+GLUVWMesh(Cube(Vector3(0f0), Vector3(1f0)))
+GLUVMesh2D(Rectangle{Float32}(0f0,0f0,10f0, 10f0))
+GLNormalMesh(Cube(Vector3(0f0), Vector3(1f0)))
 
 test()
 #1.649335471

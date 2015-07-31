@@ -1,14 +1,7 @@
 # csg.jl
 
-import Base.hypot
 
-export volume,
-       sphere,
-       cylinderX,
-       cylinderY,
-       cylinderZ,
-       box,
-       coneZ
+
 
 function volume(f, x_min,y_min,z_min,x_max,y_max,z_max, scale)
     x_rng = x_max - x_min

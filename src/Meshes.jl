@@ -2,32 +2,23 @@ module Meshes
 
 using Compat
 using GeometryTypes
-using FixedPointNumbers
-using ColorTypes # silly dependency for just one color value, but it doesn't matter as we need Geometry types anyways
-# GeometryTypes and ColorTypes both use FixedSizeArrays for the types, so loading ColorTypes should be really fast, 
-# when GeometryTypes is already present.
 
-using LightXML
-using ZipFile
+# overwritten base functions
+import Base.hypot
 
-import Base.merge
-import Base.convert
-import Base.getindex
-import Base.show
 
-using MeshIO
-importall MeshIO
-
-include("primitives.jl")
-include("merge.jl")
-include("algorithms.jl")
-
-#include("io.jl")
 include("isosurface.jl")
 export isosurface
 
-
 include("csg.jl")
+export volume,
+       sphere,
+       cylinderX,
+       cylinderY,
+       cylinderZ,
+       box,
+       coneZ
+
 #include("slice.jl")
 #include("simplification.jl")
 

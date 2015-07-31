@@ -1,5 +1,3 @@
-typealias Vertex Point3
-#
 # *** Marching Tetrahedra ***
 #
 # Marching Tetrahedra is an algorithm for extracting a triangular
@@ -31,48 +29,48 @@ typealias Vertex Point3
 #  /
 # X
 immutable VoxelIndexes{T <: Integer}
-  voxCrnrPos::Vector{Vector3{T}}
-  voxEdgeCrnrs::Vector{Vector2{T}}
-  voxEdgeDir::Vector{T}
-  voxEdgeIx::Matrix{T}
-  subTets::Matrix{T}
-  subTets::Matrix{T}
-  tetEdgeCrnrs::Matrix{T}
-  tetTri::Matrix{T}
+  voxCrnrPos    ::Vector{NTuple{3, T}}
+  voxEdgeCrnrs  ::Vector{NTuple{2, T}}
+  voxEdgeDir    ::Vector{T}
+  voxEdgeIx     ::Matrix{T}
+  subTets       ::Matrix{T}
+  subTets       ::Matrix{T}
+  tetEdgeCrnrs  ::Matrix{T}
+  tetTri        ::Matrix{T}
 
   function VoxelIndexes()
-    VT3 = Vector3{T}
-    VT2 = Vector2{T}
-    voxCrnrPos = VT3[
-                        VT3(0, 0, 0),
-                        VT3(0, 1, 0),
-                        VT3(1, 1, 0),
-                        VT3(1, 0, 0),
-                        VT3(0, 0, 1),
-                        VT3(0, 1, 1),
-                        VT3(1, 1, 1),
-                        VT3(1, 0, 1)]
+    voxCrnrPos = NTuple{3, T}[
+        (0, 0, 0),
+        (0, 1, 0),
+        (1, 1, 0),
+        (1, 0, 0),
+        (0, 0, 1),
+        (0, 1, 1),
+        (1, 1, 1),
+        (1, 0, 1)
+    ]
     # the voxel IDs at either end of the tetrahedra edges, by edge ID
-    voxEdgeCrnrs = VT2[
-                        VT2(1, 2),
-                        VT2(2, 3),
-                        VT2(4, 3),
-                        VT2(1, 4),
-                        VT2(5, 6),
-                        VT2(6, 7),
-                        VT2(8, 7),
-                        VT2(5, 8),
-                        VT2(1, 5),
-                        VT2(2, 6),
-                        VT2(3, 7),
-                        VT2(4, 8),
-                        VT2(1, 3),
-                        VT2(1, 8),
-                        VT2(1, 6),
-                        VT2(5, 7),
-                        VT2(2, 7),
-                        VT2(4, 7),
-                        VT2(1, 7)]
+    voxEdgeCrnrs = NTuple{2, T}[
+        (1, 2),
+        (2, 3),
+        (4, 3),
+        (1, 4),
+        (5, 6),
+        (6, 7),
+        (8, 7),
+        (5, 8),
+        (1, 5),
+        (2, 6),
+        (3, 7),
+        (4, 8),
+        (1, 3),
+        (1, 8),
+        (1, 6),
+        (5, 7),
+        (2, 7),
+        (4, 7),
+        (1, 7)
+    ]
 
     # direction codes:
     # 0 => +x, 1 => +y, 2 => +z, 
@@ -187,7 +185,7 @@ function vertPos{T<:Real, IType <: Integer}(e::IType, x::IType, y::IType, z::ITy
     corner1 = vxidx.voxCrnrPos[ixs[1]]
     corner2 = vxidx.voxCrnrPos[ixs[2]]
     
-    Vertex{T}(
+    Point{3, T}(
           x+b*corner1[1]+a*corner2[1],
           y+b*corner1[2]+a*corner2[2],
           z+b*corner1[3]+a*corner2[3]
@@ -196,11 +194,13 @@ end
 
 # Gets the vertex ID, adding it to the vertex dictionary if not already
 # present.
-function getVertId{T<:Real, IType <: Integer}(e::IType, x::IType, y::IType, z::IType,
-                            nx::IType, ny::IType,
-                            vals::Vector{T}, iso::T,
-                            vts::Dict{IType, Vertex{T}},
-                            eps::T, vxidx::VoxelIndexes{IType})
+function getVertId{T<:Real, IType <: Integer}(
+        e::IType, x::IType, y::IType, z::IType,
+        nx::IType, ny::IType,
+        vals::Vector{T}, iso::T,
+        vts::Dict{IType, Point{3, T}},
+        eps::T, vxidx::VoxelIndexes{IType}
+    )
 
     vId = vertId(e, x, y, z, nx, ny, vxidx)
     if !haskey(vts, vId)
@@ -219,11 +219,13 @@ end
 
 # Processes a voxel, adding any new vertices and faces to the given
 # containers as necessary.
-function procVox{T<:Real, IType <: Integer}(vals::Vector{T}, iso::T,
-                          x::IType, y::IType, z::IType,
-                          nx::IType, ny::IType,
-                          vts::Dict{IType, Vertex{T}}, fcs::Vector{Triangle{IType}},
-                          eps::T, vxidx::VoxelIndexes{IType})
+function procVox{T<:Real, IType <: Integer}(
+        vals::Vector{T}, iso::T,
+        x::IType, y::IType, z::IType,
+        nx::IType, ny::IType,
+        vts::Dict{IType, Point{3, T}}, fcs::Vector{Triangle{IType}},
+        eps::T, vxidx::VoxelIndexes{IType}
+    )
 
     # check each sub-tetrahedron in the voxel
     for i::IType = 1:6
@@ -247,7 +249,7 @@ end
 # Given a 3D array and an isovalue, extracts a mesh represention of the 
 # an approximate isosurface by the method of marching tetrahedra.
 function marchingTetrahedra{T<:Real, IT <: Integer}(lsf::AbstractArray{T,3}, iso::T, eps::T, indextype::Type{IT})
-    vts        = Dict{indextype, Vertex{T}}()
+    vts        = Dict{indextype, Point{3, T}}()
     fcs        = Array(Triangle{indextype}, 0)
     sizehint!(vts, div(length(lsf),8))
     sizehint!(fcs, div(length(lsf),4))
@@ -257,7 +259,7 @@ function marchingTetrahedra{T<:Real, IT <: Integer}(lsf::AbstractArray{T,3}, iso
     vals = zeros(T, 8)
     @inbounds for k::indextype = 1:nz-1, j::indextype = 1:ny-1, i::indextype = 1:nx-1
         for l::indextype=1:8
-          vals[l] = lsf[i+vxidx.voxCrnrPos[l][1], j+vxidx.voxCrnrPos[l][2], k+vxidx.voxCrnrPos[l][3]]
+            vals[l] = lsf[i+vxidx.voxCrnrPos[l][1], j+vxidx.voxCrnrPos[l][2], k+vxidx.voxCrnrPos[l][3]]
         end
         if hasFaces(vals,iso)
             procVox(vals, iso, i, j, k, nx, ny, vts, fcs, eps, vxidx)
