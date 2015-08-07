@@ -280,7 +280,7 @@ function isosurface(lsf, isoval, eps, indextype=Cuint, index_start=zero(Int))
         vtD[x] = k
         k += one(indextype)
     end
-    fcAry = Face3{indextype, -1}[Face3{indextype, -1}(vtD[f[1]], vtD[f[2]], vtD[f[3]]) for f in fcs]
+    fcAry = Face{3, indextype, -1}[Face{3, indextype, -1}(vtD[f[1]], vtD[f[2]], vtD[f[3]]) for f in fcs]
     vtAry = collect(values(vts))
 
     vtAry, fcAry
