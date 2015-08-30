@@ -289,7 +289,7 @@ end
 isosurface(lsf,isoval) = isosurface(lsf,isoval, convert(eltype(lsf), 0.001))
 
 
-function call{MT <: Mesh, T}(::Type{MT}, volume::Array{T, 3}, iso_val::Real, eps_val=0.001)
+function call{MT <: AbstractMesh, T}(::Type{MT}, volume::Array{T, 3}, iso_val::Real, eps_val=0.001)
     iso_val = convert(T, iso_val)
     eps_val = convert(T, eps_val)
     vts, fcs = isosurface(volume, iso_val, eps_val, eltype(facetype(MT)))
