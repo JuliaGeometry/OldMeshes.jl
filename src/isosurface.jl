@@ -34,7 +34,6 @@ immutable VoxelIndexes{T <: Integer}
   voxEdgeDir    ::Vector{T}
   voxEdgeIx     ::Matrix{T}
   subTets       ::Matrix{T}
-  subTets       ::Matrix{T}
   tetEdgeCrnrs  ::Matrix{T}
   tetTri        ::Matrix{T}
 
@@ -126,7 +125,6 @@ immutable VoxelIndexes{T <: Integer}
       voxEdgeCrnrs,
       voxEdgeDir,
       voxEdgeIx,
-      subTets,
       subTets,
       tetEdgeCrnrs,
       tetTri)
