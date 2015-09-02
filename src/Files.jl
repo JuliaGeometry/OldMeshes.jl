@@ -24,11 +24,9 @@ function mesh(path::String; format=:autodetect)
     lcase_path = lowercase(path)
     if fmt == :autodetect
         if endswith(lcase_path, ".stl")
-            header = ascii(readbytes(io, 5))
-            if lowercase(header) == "solid"
+            if detect_stlascii(io)
                 fmt = :asciistl
             else
-                readbytes(io, 75) # throw out header
                 fmt = :binarystl
             end
         elseif endswith(lcase_path, ".ply")
@@ -54,7 +52,7 @@ function mesh(path::String; format=:autodetect)
         end
     end
     if fmt == :binarystl
-        msh = importBinarySTL(io, read_header=true)
+        msh = importBinarySTL(io)
     elseif fmt == :asciistl
         msh = importAsciiSTL(io)
     elseif fmt == :asciiply
@@ -85,6 +83,43 @@ function mesh(path::String; format=:autodetect)
     end
     close(io)
     return msh
+end
+
+function detect_stlascii(io)
+    position(io) != 0 && return false
+    seekend(io)
+    len = position(io)
+    seekstart(io)
+    len < 80 && return false
+    header = readbytes(io, 80) # skip header
+    seekstart(io)
+    return header[1:6] == b"solid " && !detect_stlbinary(io)
+end
+
+function detect_stlbinary(io)
+    size_header = 80+sizeof(Uint32)
+    size_triangleblock = (4*3*sizeof(Float32)) + sizeof(Uint16)
+
+    position(io) != 0 && return false
+
+    try
+        seekend(io)
+        len = position(io)
+        seekstart(io)
+        len < size_header && return false
+
+        skip(io, 80) # skip header
+        number_of_triangle_blocks = read(io, Uint32)
+         #1 normal, 3 vertices in Float32 + attrib count, usually 0
+        len != (number_of_triangle_blocks*size_triangleblock)+size_header && return false
+        skip(io, number_of_triangle_blocks*size_triangleblock-sizeof(Uint16))
+        attrib_byte_count = read(io, Uint16) # read last attrib_byte
+        attrib_byte_count != zero(Uint16) && return false # should be zero as not used
+        eof(io) && return true
+        false
+    finally
+        seekstart(io)
+    end
 end
 
 end #module
