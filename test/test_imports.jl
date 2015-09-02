@@ -10,6 +10,10 @@ binary_stl1 = mesh(data_path*"cube_binary.stl")
 @test length(binary_stl1.vertices) == 36
 @test length(binary_stl1.faces) == 12
 
+binary_stl2 = mesh(data_path*"binary_stl_from_solidworks.STL")
+@test length(binary_stl2.vertices) == 36
+@test length(binary_stl2.faces) == 12
+
 ascii_stl1 = unique(mesh(data_path*"cube.stl"))
 @test length(ascii_stl1.vertices) == 8
 @test length(ascii_stl1.faces) == 12
