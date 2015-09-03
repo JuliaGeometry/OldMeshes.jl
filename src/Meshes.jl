@@ -4,7 +4,7 @@ using Compat
 using GeometryTypes
 
 # overwritten base functions
-import Base.hypot
+import Base: hypot
 
 
 include("isosurface.jl")
