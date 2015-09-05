@@ -3,6 +3,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Files
 
 using Meshes
+using GeometryTypes
 using Compat
 using LightXML
 using ZipFile

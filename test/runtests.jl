@@ -1,8 +1,8 @@
 using Base.Test
 using Meshes
 using Meshes.Files
+using GeometryTypes
 
-include("test_types.jl")
 include("test_meshes.jl")
 include("test_imports.jl")
 include("test_slice.jl")
