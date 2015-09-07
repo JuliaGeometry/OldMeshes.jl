@@ -4,18 +4,20 @@ module Meshes
 
 using Compat
 using GeometryTypes
+using Meshing
 
+export HomogenousMesh
 export Mesh
 export Face3
 export Point3
+export isosurface
+
 
 typealias Mesh HomogenousMesh
 typealias Point3{T} Point{3,T}
 typealias Face3{T,S} Face{3,T,S}
 
 include("Files.jl")
-include("isosurface.jl")
-include("csg.jl")
 include("slice.jl")
 #include("simplification.jl")
 
