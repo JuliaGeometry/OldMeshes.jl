@@ -10,10 +10,8 @@ export HomogenousMesh
 export Mesh
 export isosurface
 
-
 typealias Mesh HomogenousMesh
 
-include("Files.jl")
 include("slice.jl")
 #include("simplification.jl")
 

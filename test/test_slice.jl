@@ -3,7 +3,7 @@ println("Testing Slice..")
 
 data_path = Pkg.dir("Meshes")*"/test/data/"
 
-s = slice(mesh(data_path*"cube_binary.stl"), [1.0, 2.0])
+s = slice(load(data_path*"cube_binary.stl"), [1.0, 2.0])
 
 let
     @test length(s) == 2
