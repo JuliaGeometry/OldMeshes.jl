@@ -92,12 +92,12 @@ function importBinarySTL(file::IO;read_header=false)
     #Binary STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#Binary_STL
 
-    binarySTLvertex(file) = Point3{Float64}((@compat Float64(read(file, Float32))),
+    binarySTLvertex(file) = Point{3,Float64}((@compat Float64(read(file, Float32))),
                                    (@compat Float64(read(file, Float32))),
                                    (@compat Float64(read(file, Float32))))
 
-    vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    vts = Point{3,Float64}[]
+    fcs = Face{3,Int,0}[]
 
     if !read_header
         readbytes(file, 80) # throw out header
@@ -115,10 +115,10 @@ function importBinarySTL(file::IO;read_header=false)
             vert_idx[i] = vert_count
         end
         skip(file, 2) # throwout 16bit attribute
-        push!(fcs, Face3{Int,0}(vert_idx...))
+        push!(fcs, Face{3,Int,0}(vert_idx...))
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point{3,Float64}, Face{3,Int,0}}(vts, fcs)
 end
 
 function importAsciiSTL(file::String)
@@ -132,27 +132,27 @@ function importAsciiSTL(file::IO)
     #ASCII STL
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
-    vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    vts = Point{3,Float64}[]
+    fcs = Face{3,Int,0}[]
 
     vert_count = 0
     vert_idx = [0,0,0]
     while !eof(file)
         line = split(lowercase(readline(file)))
         if !isempty(line) && line[1] == "facet"
-            normal = Point3{Float64}([parse(Float64, x) for x in line[3:5]]...)
+            normal = Point{3,Float64}([parse(Float64, x) for x in line[3:5]]...)
             readline(file) # Throw away outerloop
             for i = 1:3
-                vertex = Point3{Float64}([parse(Float64, x) for x in split(readline(file))[2:4]]...)
+                vertex = Point{3,Float64}([parse(Float64, x) for x in split(readline(file))[2:4]]...)
                 push!(vts, vertex)
                 vert_count += 1
                 vert_idx[i] = vert_count
             end
             readline(file) # throwout endloop
             readline(file) # throwout endfacet
-            push!(fcs, Face3{Int,0}(vert_idx...))
+            push!(fcs, Face{3,Int,0}(vert_idx...))
         end
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point{3,Float64}, Face{3,Int,0}}(vts, fcs)
 end

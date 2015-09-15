@@ -76,8 +76,8 @@ end
 
 
 function importAsciiPly(io::IO)
-    vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    vts = Point{3,Float64}[]
+    fcs = Face{3,Int,0}[]
 
     nV = 0
     nF = 0
@@ -100,17 +100,17 @@ function importAsciiPly(io::IO)
     for i = 1:nV
         txt = readline(io)   # -0.018 0.038 0.086
         vs = [parse(Float64, i) for i in split(txt)]
-        push!(vts, Point3{Float64}(vs[1], vs[2], vs[3]))
+        push!(vts, Point{3,Float64}(vs[1], vs[2], vs[3]))
     end
 
     for i = 1:nF
         txt = readline(io)   # 3 0 1 2
         fs = [parse(Int, i) for i in split(txt)]
         for i = 3:fs[1] #triangulate
-            push!(fcs, Face3{Int,0}(fs[2]+1, fs[i]+1, fs[i+1]+1))
+            push!(fcs, Face{3,Int,0}(fs[2]+1, fs[i]+1, fs[i+1]+1))
         end
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point{3,Float64}, Face{3,Int,0}}(vts, fcs)
 end
 
