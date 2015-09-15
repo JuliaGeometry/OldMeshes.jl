@@ -44,7 +44,7 @@ end
 function importOFF(io::IO)
 
     local vts
-    fcs = Face3{Int,0}[] # faces might be triangulated, so we can't assume count
+    fcs = Face{3,Int,0}[] # faces might be triangulated, so we can't assume count
     nV = 0
     nF = 0
 
@@ -66,7 +66,7 @@ function importOFF(io::IO)
             face = Int[@compat parse(Int, s) for s in split(txt)]
             if length(face) >= 4
                 for i = 4:length(face) #triangulate
-                    push!(fcs, Face3{Int,0}(face[2]+1, face[i-1]+1, face[i]+1))
+                    push!(fcs, Face{3,Int,0}(face[2]+1, face[i-1]+1, face[i]+1))
                 end
             end
             continue
@@ -79,5 +79,5 @@ function importOFF(io::IO)
         end
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
 end

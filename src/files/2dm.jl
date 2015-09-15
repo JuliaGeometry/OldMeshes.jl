@@ -12,18 +12,18 @@ end
 
 parseNode(w::Array{String}) = Point3{Float64}(parse(Float64, w[3]), parse(Float64, w[4]), parse(Float64, w[5]))
 
-parseTriangle(w::Array{String}) = Face3{Int,0}(parse(Int, w[3]), parse(Int, w[4]), parse(Int, w[5]))
+parseTriangle(w::Array{String}) = Face{3,Int,0}(parse(Int, w[3]), parse(Int, w[4]), parse(Int, w[5]))
 
 # Qudrilateral faces are split up into triangles
 function parseQuad(w::Array{String})
     w[7] = w[3]                     # making a circle
-    Face3{Int,0}[Face3{Int,0}(w[i], w[i+1], w[i+2]) for i = [3,5]]
+    Face{3,Int,0}[Face{3,Int,0}(w[i], w[i+1], w[i+2]) for i = [3,5]]
 end
 
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(con::IO)
     nd =  Point3{Float64}[]
-    ele = Face3{Int,0}[]
+    ele = Face{3,Int,0}[]
     for line = readlines(con)
         line = chomp(line)
         w = split(line)

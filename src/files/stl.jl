@@ -97,7 +97,7 @@ function importBinarySTL(file::IO;read_header=false)
                                    (@compat Float64(read(file, Float32))))
 
     vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    fcs = Face{3,Int,0}[]
 
     if !read_header
         readbytes(file, 80) # throw out header
@@ -115,10 +115,10 @@ function importBinarySTL(file::IO;read_header=false)
             vert_idx[i] = vert_count
         end
         skip(file, 2) # throwout 16bit attribute
-        push!(fcs, Face3{Int,0}(vert_idx...))
+        push!(fcs, Face{3,Int,0}(vert_idx...))
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
 end
 
 function importAsciiSTL(file::String)
@@ -133,7 +133,7 @@ function importAsciiSTL(file::IO)
     #https://en.wikipedia.org/wiki/STL_%28file_format%29#ASCII_STL
 
     vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    fcs = Face{3,Int,0}[]
 
     vert_count = 0
     vert_idx = [0,0,0]
@@ -150,9 +150,9 @@ function importAsciiSTL(file::IO)
             end
             readline(file) # throwout endloop
             readline(file) # throwout endfacet
-            push!(fcs, Face3{Int,0}(vert_idx...))
+            push!(fcs, Face{3,Int,0}(vert_idx...))
         end
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
 end

@@ -10,7 +10,7 @@ end
 
 function importOBJ(io::IO)
     vts = Point3{Float64}[]
-    fcs = Face3{Int,0}[]
+    fcs = Face{3,Int,0}[]
 
     nV = 0
     nF = 0
@@ -26,11 +26,11 @@ function importOBJ(io::IO)
             #get verts
             verts = [parse(Int, split(line[i], "/")[1]) for i = 2:length(line)]
             for i = 3:length(verts) #triangulate
-                push!(fcs, Face3{Int,0}(verts[1], verts[i-1], verts[i]))
+                push!(fcs, Face{3,Int,0}(verts[1], verts[i-1], verts[i]))
             end
         end
     end
 
-    return Mesh{Point3{Float64}, Face3{Int,0}}(vts, fcs)
+    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
 end
 
