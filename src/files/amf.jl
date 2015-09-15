@@ -9,17 +9,17 @@ function importAMF(io::IO)
     vertices = find_element(mesh, "vertices")
     volumes = get_elements_by_tagname(mesh, "volume")
 
-    vts = Point3{Float64}[]
+    vts = Point{3,Float64}[]
 
     for vertex in child_elements(vertices)
         coords = find_element(vertex, "coordinates")
         x = content(find_element(coords, "x"))
         y = content(find_element(coords, "y"))
         z = content(find_element(coords, "z"))
-        push!(vts, Point3{Float64}(parse(Float64, x), parse(Float64, y), parse(Float64, z)))
+        push!(vts, Point{3,Float64}(parse(Float64, x), parse(Float64, y), parse(Float64, z)))
     end
 
-    meshes = Mesh{Point3{Float64}, Face{3,Int,0}}[]
+    meshes = Mesh{Point{3,Float64}, Face{3,Int,0}}[]
 
     for volume in volumes
         fcs = Face{3,Int,0}[]

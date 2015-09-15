@@ -9,7 +9,7 @@ end
 
 
 function importOBJ(io::IO)
-    vts = Point3{Float64}[]
+    vts = Point{3,Float64}[]
     fcs = Face{3,Int,0}[]
 
     nV = 0
@@ -19,7 +19,7 @@ function importOBJ(io::IO)
         txt = readline(io)
         line = split(txt)
         if line[1] == "v" #vertex
-            push!(vts, Point3{Float64}(parse(Float64, line[2]),
+            push!(vts, Point{3,Float64}(parse(Float64, line[2]),
                               parse(Float64, line[3]),
                               parse(Float64, line[4])))
         elseif line[1] == "f" #face
@@ -31,6 +31,6 @@ function importOBJ(io::IO)
         end
     end
 
-    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
+    return Mesh{Point{3,Float64}, Face{3,Int,0}}(vts, fcs)
 end
 

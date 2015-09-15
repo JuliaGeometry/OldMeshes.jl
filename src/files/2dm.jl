@@ -10,7 +10,7 @@ function import2dm(file::String)
     return mesh
 end
 
-parseNode(w::Array{String}) = Point3{Float64}(parse(Float64, w[3]), parse(Float64, w[4]), parse(Float64, w[5]))
+parseNode(w::Array{String}) = Point{3,Float64}(parse(Float64, w[3]), parse(Float64, w[4]), parse(Float64, w[5]))
 
 parseTriangle(w::Array{String}) = Face{3,Int,0}(parse(Int, w[3]), parse(Int, w[4]), parse(Int, w[5]))
 
@@ -22,7 +22,7 @@ end
 
 # | Read a .2dm (SMS Aquaveo) mesh-file and construct a @Mesh@
 function import2dm(con::IO)
-    nd =  Point3{Float64}[]
+    nd =  Point{3,Float64}[]
     ele = Face{3,Int,0}[]
     for line = readlines(con)
         line = chomp(line)
@@ -37,13 +37,13 @@ function import2dm(con::IO)
             continue
         end
     end
-    Mesh{Point3{Float64}, Face{Int}}(nd,ele)
+    Mesh{Point{3,Float64}, Face{Int}}(nd,ele)
 end
 
 
 # | Write @Mesh@ to an IOStream
 function export2dm(con::IO,m::Mesh)
-    function renderVertex(i::Int,v::Point3{Float64})
+    function renderVertex(i::Int,v::Point{3,Float64})
         "ND $i $(v.e1) $(v.e2) $(v.e3)\n"
     end
     function renderFace(i::Int, f::Face)

@@ -8,12 +8,10 @@ using Meshing
 
 export HomogenousMesh
 export Mesh
-export Point3
 export isosurface
 
 
 typealias Mesh HomogenousMesh
-typealias Point3{T} Point{3,T}
 
 include("Files.jl")
 include("slice.jl")

@@ -59,7 +59,7 @@ function importOFF(io::IO)
             vert = Float64[@compat parse(Float64, s) for s in split(txt)]
             if length(vert) == 3
                 read_verts += 1
-                vts[read_verts] = Point3{Float64}(vert...)
+                vts[read_verts] = Point{3,Float64}(vert...)
             end
             continue
         elseif found_counts # read faces
@@ -74,10 +74,10 @@ function importOFF(io::IO)
             counts = Int[@compat parse(Int, s) for s in split(txt)]
             nV = counts[1]
             nF = counts[2]
-            vts = Array(Point3{Float64}, nV)
+            vts = Array(Point{3,Float64}, nV)
             found_counts = true
         end
     end
 
-    return Mesh{Point3{Float64}, Face{3,Int,0}}(vts, fcs)
+    return Mesh{Point{3,Float64}, Face{3,Int,0}}(vts, fcs)
 end
