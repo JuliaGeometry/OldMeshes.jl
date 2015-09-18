@@ -1,6 +1,5 @@
 using Base.Test
 using Meshes
-using FileIO
 using GeometryTypes
 
 include("test_slice.jl")
