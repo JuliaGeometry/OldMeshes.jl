@@ -1,5 +1,5 @@
 # TODO Return type channges based on pair value
-function Base.slice(mesh::Mesh{Point{3,Float64}, Face{3,Int,0}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
+function Base.slice{VT<:Point{3,Float64},FT<:Face{3,Int,0}}(mesh::AbstractMesh{VT,FT}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
 
     height_ct = length(heights)
     slices = [@compat Tuple{Point{2,Float64}, Point{2,Float64}}[] for i = 1:height_ct]

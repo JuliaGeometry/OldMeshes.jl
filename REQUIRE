@@ -1,8 +1,4 @@
 julia 0.4-
 GeometryTypes
-DataStructures
-ZipFile
-LightXML
-JSON
 Meshing
 Compat
