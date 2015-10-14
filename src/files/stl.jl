@@ -102,7 +102,7 @@ function importBinarySTL(file::IO;read_header=false)
     if !read_header
         readbytes(file, 80) # throw out header
     end
-    read(file, Uint32) # throwout triangle count
+    read(file, UInt32) # throwout triangle count
 
     vert_count = 0
     vert_idx = [0,0,0]
