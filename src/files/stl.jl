@@ -5,7 +5,7 @@ export exportStl,
 
 import Base.writemime
 
-function exportStl(msh::Mesh, fn::String)
+function exportStl(msh::Mesh, fn::AbstractString)
     exportStl(msh, open(fn, "w"))
 end
 
@@ -43,7 +43,7 @@ function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
     end
 end
 
-function exportBinaryStl(msh::Mesh, fn::String)
+function exportBinaryStl(msh::Mesh, fn::AbstractString)
     exportBinaryStl(msh, open(fn, "w"))
 end
 
@@ -81,7 +81,7 @@ function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
 end
 
 
-function importBinarySTL(file::String)
+function importBinarySTL(file::AbstractString)
     fn = open(file,"r")
     mesh = importBinarySTL(fn)
     close(fn)
@@ -121,7 +121,7 @@ function importBinarySTL(file::IO;read_header=false)
     return Mesh{Vertex, Face{Int}}(vts, fcs)
 end
 
-function importAsciiSTL(file::String)
+function importAsciiSTL(file::AbstractString)
     fn = open(file,"r")
     mesh = importAsciiSTL(fn)
     close(fn)

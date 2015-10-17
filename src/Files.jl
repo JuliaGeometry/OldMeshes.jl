@@ -17,7 +17,7 @@ include("files/threejs.jl")
 
 export mesh
 
-function mesh(path::String; format=:autodetect)
+function mesh(path::AbstractString; format=:autodetect)
     io = open(path, "r")
     fmt = format
     local msh
