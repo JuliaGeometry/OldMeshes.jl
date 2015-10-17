@@ -17,7 +17,7 @@ include("files/threejs.jl")
 
 export mesh
 
-function mesh(path::String; format=:autodetect)
+function mesh(path::AbstractString; format=:autodetect)
     io = open(path, "r")
     fmt = format
     local msh
@@ -97,8 +97,8 @@ function detect_stlascii(io)
 end
 
 function detect_stlbinary(io)
-    size_header = 80+sizeof(Uint32)
-    size_triangleblock = (4*3*sizeof(Float32)) + sizeof(Uint16)
+    size_header = 80+sizeof(UInt32)
+    size_triangleblock = (4*3*sizeof(Float32)) + sizeof(UInt16)
 
     position(io) != 0 && return false
 
@@ -109,12 +109,12 @@ function detect_stlbinary(io)
         len < size_header && return false
 
         skip(io, 80) # skip header
-        number_of_triangle_blocks = read(io, Uint32)
+        number_of_triangle_blocks = read(io, UInt32)
          #1 normal, 3 vertices in Float32 + attrib count, usually 0
         len != (number_of_triangle_blocks*size_triangleblock)+size_header && return false
-        skip(io, number_of_triangle_blocks*size_triangleblock-sizeof(Uint16))
-        attrib_byte_count = read(io, Uint16) # read last attrib_byte
-        attrib_byte_count != zero(Uint16) && return false # should be zero as not used
+        skip(io, number_of_triangle_blocks*size_triangleblock-sizeof(UInt16))
+        attrib_byte_count = read(io, UInt16) # read last attrib_byte
+        attrib_byte_count != zero(UInt16) && return false # should be zero as not used
         eof(io) && return true
         false
     finally

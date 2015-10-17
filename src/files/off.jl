@@ -1,6 +1,6 @@
 export exportOFF
 
-function exportOFF(msh::Mesh, fn::String, rgba)
+function exportOFF(msh::Mesh, fn::AbstractString, rgba)
     # writes an OFF geometry file, with colors
     #  see http://people.sc.fsu.edu/~jburkardt/data/off/off.html
     #  for format description
@@ -33,7 +33,7 @@ function exportOFF(msh::Mesh, fn::String, rgba)
     close(str)
 end
 
-function importOFF(fn::String)
+function importOFF(fn::AbstractString)
     str = open(fn,"r")
     mesh = importOFF(str)
     close(str)
