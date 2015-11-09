@@ -3,64 +3,64 @@
 [![Build Status](https://travis-ci.org/JuliaGeometry/Meshes.jl.svg?branch=master)](https://travis-ci.org/JuliaGeometry/Meshes.jl)
 [![Coverage Status](https://img.shields.io/coveralls/JuliaGeometry/Meshes.jl.svg)](https://coveralls.io/r/JuliaGeometry/Meshes.jl)
 
-Generation and manipulation of triangular [polygon meshes](https://en.wikipedia.org/wiki/Polygon_mesh).
+This package is designed to make it easy to work with [polygon mesh data](https://en.wikipedia.org/wiki/Polygon_mesh).
+It is a primarily a meta-package for
+[Meshing](https://github.com/JuliaGeometry/Meshing.jl),
+[MeshIO](https://github.com/JuliaIO/MeshIO.jl),
+and [GeometryTypes](https://github.com/JuliaGeometry/GeometryTypes.jl).
+In addition, it is a great (and recommended) place for experimental
+development that is not yet congruent with the GeometryTypes type heirarchy.
 
-## Features
-1. Isosurface extraction via [marching tetrahedra](https://en.wikipedia.org/wiki/Marching_tetrahedra).
-2. Construction of volumes from primitive solids (sphere, box, cylinder).
+
+## Data Types
+
+Meshes does not define many datatypes, but rather it uses those defined by
+[GeometryTypes](https://github.com/JuliaGeometry/GeometryTypes.jl) where possible.
+
+## Functionality
+
+### Meshing
+
+This functionality is derived from the
+[Meshing](https://github.com/JuliaGeometry/Meshing.jl) package.
+Full documentation is available there.
+In combination with GeometryTypes it is easy to mesh implicit functions.
+
+```
+using Meshes
+using GeometryTypes
+
+s = SignedDistanceField(HyperRectangle(Vec(0,0,0.),Vec(1,1,1.))) do v
+           sqrt(sum(dot(v,v))) - 1 # sphere
+       end
+m = HomogenousMesh(s) # uses Marching Tetrahedra from Meshing.jl
+save("eighth_sphere.ply",m)
+```
 
 ## Files
 
-Import and export features can be accessed by `using`/`import`ing `Meshes.Files`.
+Meshes v0.2.0 and up depends on the Julia FileIO framework in order to load
+files. This is re-exported from FileIO.
 
-### Import
-Supported file formats:
-* [Binary and ASCII STL](https://en.wikipedia.org/wiki/STL_%28file_format%29)
-* [Aquaveo-SMS 2DM](http://www.xmswiki.com/xms/SMS:2D_Mesh_Files_*.2dm)
-* [ASCII PLY](https://en.wikipedia.org/wiki/PLY)
-* [OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file)
-* [AMF](http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format)
-* [OFF](https://en.wikipedia.org/wiki/OFF_%28file_format%29)
-* [threejs](https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3)
+```
+using Meshes
+m = load("my3dmodel.obj")
+save("my3dmodel_now_a.ply", m)
+```
 
-Meshes can be imported with the following function.
+## History
 
-```mesh(path::String; format=:autodetect)```
-
-By default the function autodetects the file format for you. You can specify a
-format manually by setting `format` to one of:
-* `:asciiply`
-* `:(2dm)`
-* `:obj`
-* `:binarystl`
-* `:asciistl`
-* `:amf`
-* `:off`
-* `:threejs`
-
-By default we do not check topology for repeat vertices since it can be
-computationally expensive. See:[face-vertex](https://en.wikipedia.org/wiki/Polygon_mesh#Face-vertex_meshes) polygon mesh.
-
-### Export
-Support export formats:
-* [Binary and ASCII STL](https://en.wikipedia.org/wiki/STL_%28file_format%29)
-* [Aquaveo-SMS 2DM](http://www.xmswiki.com/xms/SMS:2D_Mesh_Files_*.2dm)
-* [Binary and ASCII PLY](https://en.wikipedia.org/wiki/PLY)
-* [OFF](https://en.wikipedia.org/wiki/OFF_%28file_format%29)
-* [threejs](https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3)
-
-## Roadmap
-
-### [0.2.0](https://github.com/JuliaGeometry/Meshes.jl/milestones/v0.2.0)
-
-1. Merge improvements in [Meshes2](https://github.com/JuliaGeometry/Meshes2.jl)
-2. First release requiring Julia 0.4
-3. Update `Meshes.Files` to work better with FileIO API
-
-### Future
-
-1. Basic mesh simplification
-2. [Mesh repair](https://github.com/JuliaGeometry/Meshes.jl/issues/33)
+This package started with an inclusive focus on Mesh geometry. For the first
+year of existence it worked exclusively for computational geometry purposes. In
+early 2015 an effort started to generalize for compatibilty with display
+libraries such as OpenGL. This meant redesigning types and operations.
+Ultimately it was broken up into other packages to facilitate collaboration.
+Most notably
+[Meshing](https://github.com/JuliaGeometry/Meshing.jl),
+[MeshIO](https://github.com/JuliaIO/MeshIO.jl),
+and [GeometryTypes](https://github.com/JuliaGeometry/GeometryTypes.jl)
+contain a significant portion of the original code. We plan to support this
+package as a meta-package for domain focused usability and extensions.
 
 ## License
 This package is available under the MIT "Expat" License. See [LICENSE.md](./LICENSE.md).
