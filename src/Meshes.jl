@@ -5,14 +5,16 @@ module Meshes
 using Compat
 using GeometryTypes
 using Meshing
+using MeshIO
+using FileIO
 
 export HomogenousMesh
 export Mesh
 export isosurface
+export load, save #FileIO
 
 typealias Mesh HomogenousMesh
 
-include("slice.jl")
 #include("simplification.jl")
 
 end # module Meshes
