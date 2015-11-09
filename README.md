@@ -11,6 +11,9 @@ and [GeometryTypes](https://github.com/JuliaGeometry/GeometryTypes.jl).
 In addition, it is a great (and recommended) place for experimental
 development that is not yet congruent with the GeometryTypes type heirarchy.
 
+The current release series corresponds to `v0.2.x`. The pre-GeometryTypes, et. al.
+version, [`v0.1.x`](https://github.com/JuliaGeometry/Meshes.jl/tree/v0.1.x),
+is still supported by [@sjkelly](https://github.com/sjkelly/).
 
 ## Data Types
 
@@ -50,7 +53,7 @@ save("my3dmodel_now_a.ply", m)
 
 ## History
 
-This package started with an inclusive focus on Mesh geometry. For the first
+This package started with an exclusive focus on Mesh geometry. For the first
 year of existence it worked exclusively for computational geometry purposes. In
 early 2015 an effort started to generalize for compatibilty with display
 libraries such as OpenGL. This meant redesigning types and operations.
