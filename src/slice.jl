@@ -1,5 +1,5 @@
 # TODO Return type channges based on pair value
-function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.00001, autoeps=true)
+function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Float64}, pair=true; eps=0.0001)
 
     height_ct = length(heights)
     slices = [@compat Tuple{Vector2{Float64}, Vector2{Float64}}[] for i = 1:height_ct]
@@ -10,6 +10,7 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         v3 = mesh.vertices[face.v3]
         zmax = max(v1[3], v2[3], v3[3])
         zmin = min(v1[3], v2[3], v3[3])
+
         for i = 1:height_ct
             height = heights[i]
             if height > zmax
@@ -68,39 +69,33 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
         polys = Vector{@compat Tuple{Vector2{Float64}, Vector2{Float64}}}[]
         paired = fill(false, line_ct)
         start = 1
-        seg = 1
-        paired[seg] = true
-
-        if autoeps
-            for segment in lines
-                eps = min(eps, norm(segment[1]-segment[2])/2)
-            end
-        end
-
+        paired[start] = true
+        
         @inbounds while true
             #Start new polygon with seg
             poly = @compat Tuple{Vector2{Float64}, Vector2{Float64}}[]
-            push!(poly, lines[seg])
+            push!(poly, lines[start])
 
             #Pair slice until we get to start point
-            lastseg = seg
-            while norm(lines[start][1] - lines[seg][2]) >= eps
-                lastseg = seg
+            while norm(poly[1][1] - poly[end][2]) >= eps
+                min_dist = eps
+                min_index = 0
 
                 for i = 1:line_ct
                     if !paired[i]
-                        if norm(lines[seg][2] - lines[i][1]) <= eps
-                            push!(poly, lines[i])
-                            paired[i] = true
-                            seg = i
+                        dist = norm(poly[end][2] - lines[i][1])
+                        if dist <= min_dist
+                            min_dist = dist
+                            min_index = i
                         end
                     end
                 end
 
-                if (seg == start #We couldn't pair the segment
-                    || seg == lastseg) #The polygon can't be closed
+                if min_index == 0
                     break
                 end
+                push!(poly, lines[min_index])
+                paired[min_index] = true
             end
 
             if length(poly) > 2
@@ -128,7 +123,6 @@ function Base.slice(mesh::Mesh{Vector3{Float64}, Face{Int}}, heights::Vector{Flo
                 if !paired[i] #Find next unpaired seg
                     start = i
                     paired[i] = true
-                    seg = start
                     break
                 elseif i == length(lines) #we have paired each segment
                     finished_pairing = true
