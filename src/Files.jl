@@ -17,7 +17,7 @@ include("files/threejs.jl")
 
 export mesh
 
-function mesh(path::AbstractString; format=:autodetect)
+function mesh(path::String; format=:autodetect)
     io = open(path, "r")
     fmt = format
     local msh
@@ -65,7 +65,7 @@ function mesh(path::AbstractString; format=:autodetect)
         msh = importOBJ(io)
     elseif fmt == :amf
         # check if zipped
-        header = readbytes(io,4)
+        header = read(io,4)
         close(io)
         if header == [0x50,0x4b,0x03,0x04]
             contents = ZipFile.Reader(path)
@@ -91,7 +91,7 @@ function detect_stlascii(io)
     len = position(io)
     seekstart(io)
     len < 80 && return false
-    header = readbytes(io, 80) # skip header
+    header = read(io, 80) # skip header
     seekstart(io)
     return header[1:6] == b"solid " && !detect_stlbinary(io)
 end

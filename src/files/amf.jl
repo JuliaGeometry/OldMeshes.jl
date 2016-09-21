@@ -1,7 +1,7 @@
 # http://en.wikipedia.org/wiki/Additive_Manufacturing_File_Format
 
 function importAMF(io::IO)
-    str = readall(io)
+    str = readstring(io)
     xml = parse_string(str)
     xml_root = root(xml)
     object = find_element(xml_root, "object")
@@ -34,4 +34,3 @@ function importAMF(io::IO)
     end
     return meshes
 end
-

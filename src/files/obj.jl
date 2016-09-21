@@ -1,6 +1,6 @@
 # https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
-function importOBJ(fn::AbstractString)
+function importOBJ(fn::String)
     str = open(fn,"r")
     mesh = importOBJ(str)
     close(str)

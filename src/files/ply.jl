@@ -2,7 +2,7 @@ export exportBinaryPly,
        exportAsciiPly,
        importAsciiPly
 
-function exportBinaryPly(msh::Mesh, fn::AbstractString)
+function exportBinaryPly(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -37,7 +37,7 @@ function exportBinaryPly(msh::Mesh, fn::AbstractString)
 end
 
 
-function exportAsciiPly(msh::Mesh, fn::AbstractString)
+function exportAsciiPly(msh::Mesh, fn::String)
     vts = msh.vertices
     fcs = msh.faces
     nV = size(vts,1)
@@ -67,7 +67,7 @@ function exportAsciiPly(msh::Mesh, fn::AbstractString)
 end
 
 
-function importAsciiPly(fn::AbstractString)
+function importAsciiPly(fn::String)
     io = open(fn, "r")
     mesh = importAsciiPly(io)
     close(io)
@@ -81,7 +81,7 @@ function importAsciiPly(io::IO)
 
     nV = 0
     nF = 0
-    properties = AbstractString[]
+    properties = String[]
 
     # read the header
     line = readline(io)

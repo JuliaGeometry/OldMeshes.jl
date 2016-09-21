@@ -3,9 +3,7 @@ export exportStl,
        importBinarySTL,
        importAsciiSTL
 
-import Base.writemime
-
-function exportStl(msh::Mesh, fn::AbstractString)
+function exportStl(msh::Mesh, fn::String)
     exportStl(msh, open(fn, "w"))
 end
 
@@ -43,7 +41,7 @@ function exportStl(msh::Mesh, str::IO, closeAfterwards::Bool=true)
     end
 end
 
-function exportBinaryStl(msh::Mesh, fn::AbstractString)
+function exportBinaryStl(msh::Mesh, fn::String)
     exportBinaryStl(msh, open(fn, "w"))
 end
 
@@ -81,7 +79,7 @@ function writemime(io::IO, ::MIME"model/stl+ascii", msh::Mesh)
 end
 
 
-function importBinarySTL(file::AbstractString)
+function importBinarySTL(file::String)
     fn = open(file,"r")
     mesh = importBinarySTL(fn)
     close(fn)
@@ -100,7 +98,7 @@ function importBinarySTL(file::IO;read_header=false)
     fcs = Face{Int}[]
 
     if !read_header
-        readbytes(file, 80) # throw out header
+        read(file, 80) # throw out header
     end
     read(file, UInt32) # throwout triangle count
 
@@ -121,7 +119,7 @@ function importBinarySTL(file::IO;read_header=false)
     return Mesh{Vertex, Face{Int}}(vts, fcs)
 end
 
-function importAsciiSTL(file::AbstractString)
+function importAsciiSTL(file::String)
     fn = open(file,"r")
     mesh = importAsciiSTL(fn)
     close(fn)
