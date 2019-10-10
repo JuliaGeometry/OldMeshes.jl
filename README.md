@@ -1,3 +1,13 @@
+Dear visitor:
+
+This package is no longer maintained. Its usable contents have long ago migrated to
+[Meshing](https://github.com/JuliaGeometry/Meshing.jl) and
+[MeshIO](https://github.com/JuliaIO/MeshIO.jl). The remaining bit of code related to [mesh simplification](https://github.com/JuliaGeometry/OldMeshes.jl/blob/534cc58111636ddd837669ca156c44c1eb24a8a4/src/simplification.jl#L1)
+had not yet found its way into another package at the time of this writing, but I don't believe it ever worked correctly, anyway. Still, it might serve as a starting point for a correct implementation. After all, I based it on a correct C++ implementation that I had created previously.
+
+Sincerely,
+[Tracy Wadleigh](https://github.com/twadleigh), original author.
+
 # Meshes.jl
 
 [![Build Status](https://travis-ci.org/JuliaGeometry/Meshes.jl.svg?branch=master)](https://travis-ci.org/JuliaGeometry/Meshes.jl)
